@@ -23,15 +23,15 @@ app.use("/comments", commentRoutes);
 import followRoutes from "./routes/follow.routes.js";
 app.use("/follow", followRoutes);
 
-import saveRoutes from "./routes/save.routes.js";
-app.use("/save", saveRoutes);
+    import saveRoutes from "./routes/save.routes.js";
+    app.use("/save", saveRoutes);
 
-import notificationRoutes from "./routes/notification.routes.js";
-app.use("/api/notifications", notificationRoutes);
+    import notificationRoutes from "./routes/notification.routes.js";
+    app.use("/api/notifications", notificationRoutes);
 
-app.get('/', (req, res)=>{
-    res.send('Hello World!');
-});
+    app.get('/', (req, res)=>{
+        res.send('Hello World!');
+    });
 
 
-export default app;
+    export default app;
