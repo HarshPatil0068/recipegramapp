@@ -171,14 +171,14 @@ const ChatWindow = ({ conversation, onBack }) => {
   };
 
   return (
-    <div className="flex flex-col bg-cream-100 h-full md:h-auto md:flex-1">
+    <div className="flex flex-col bg-white h-full md:h-auto md:flex-1">
       {/* Header */}
-      <div className="border-b border-cream-300 px-4 py-3 flex items-center justify-between shrink-0">
+      <div className="border-b border-cream-200 px-5 py-4 flex items-center justify-between shrink-0 bg-white shadow-sm">
         <div className="flex items-center gap-3">
           <button
             onClick={onBack}
-            className="md:hidden p-2 hover:bg-cream-200 rounded-full transition-colors -ml-2"
-            title="Back"
+            className="md:hidden p-2 hover:bg-cream-100 rounded-full transition-all active:scale-95 -ml-2"
+            title="Back to conversations"
           >
             <svg
               className="w-5 h-5 text-warmGray-700"
@@ -201,19 +201,22 @@ const ChatWindow = ({ conversation, onBack }) => {
               `https://api.dicebear.com/7.x/avataaars/svg?seed=${conversation.username}`
             }
             alt={conversation.username}
-            className="w-10 h-10 rounded-full object-cover"
+            className="w-11 h-11 rounded-full object-cover border-2 border-cream-200"
           />
           <div>
-            <h2 className="font-semibold text-warmGray-900">{conversation.username}</h2>
-            <p className="text-xs text-warmGray-500">Active now</p>
+            <h2 className="font-bold text-warmGray-900">{conversation.username}</h2>
+            <div className="flex items-center gap-1.5">
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <p className="text-xs text-warmGray-500">Active now</p>
+            </div>
           </div>
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-2">
-          <button className="p-2 hover:bg-cream-200 rounded-full transition-colors hidden sm:block" title="Voice call">
+        <div className="flex items-center gap-1">
+          <button className="p-2.5 hover:bg-cream-100 rounded-full transition-all active:scale-95 hidden sm:block" title="Voice call">
             <svg
-              className="w-5 h-5 text-warmGray-700"
+              className="w-5 h-5 text-warmGray-600"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -227,9 +230,9 @@ const ChatWindow = ({ conversation, onBack }) => {
             </svg>
           </button>
 
-          <button className="p-2 hover:bg-cream-200 rounded-full transition-colors hidden sm:block" title="Video call">
+          <button className="p-2.5 hover:bg-cream-100 rounded-full transition-all active:scale-95 hidden sm:block" title="Video call">
             <svg
-              className="w-5 h-5 text-warmGray-700"
+              className="w-5 h-5 text-warmGray-600"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -246,13 +249,21 @@ const ChatWindow = ({ conversation, onBack }) => {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-4 bg-cream-50">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-3 bg-gradient-to-b from-cream-50 to-white">
         {loading ? (
-          <Loading />
+          <div className="h-full flex items-center justify-center">
+            <Loading />
+          </div>
         ) : currentConversation.messages.length === 0 ? (
           <div className="h-full flex items-center justify-center">
-            <div className="text-center">
-              <p className="text-warmGray-500">No messages yet. Start the conversation!</p>
+            <div className="text-center px-4">
+              <div className="w-20 h-20 mx-auto mb-4 bg-primary-100 rounded-full flex items-center justify-center">
+                <svg className="w-10 h-10 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+              </div>
+              <p className="text-warmGray-600 font-medium mb-2">No messages yet</p>
+              <p className="text-warmGray-400 text-sm">Start the conversation by saying hi!</p>
             </div>
           </div>
         ) : (
@@ -267,8 +278,13 @@ const ChatWindow = ({ conversation, onBack }) => {
               />
             ))}
             {typingUser && (
-              <div className="text-xs text-warmGray-500">
-                {typingUser.username} is typing...
+              <div className="flex items-center gap-2 px-2">
+                <div className="flex gap-1">
+                  <div className="w-2 h-2 bg-warmGray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                  <div className="w-2 h-2 bg-warmGray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                  <div className="w-2 h-2 bg-warmGray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                </div>
+                <span className="text-xs text-warmGray-500">{typingUser.username} is typing</span>
               </div>
             )}
             <div ref={messagesEndRef} />
@@ -277,31 +293,33 @@ const ChatWindow = ({ conversation, onBack }) => {
       </div>
 
       {/* Input Area */}
-      <form onSubmit={handleSendMessage} className="border-t border-cream-300 p-3 bg-cream-100 shrink-0">
+      <form onSubmit={handleSendMessage} className="border-t border-cream-200 p-4 bg-white shrink-0 shadow-lg">
         {replyTo && (
-          <div className="mb-3 px-3 py-2 rounded-lg bg-cream-200 border border-cream-300 flex items-start justify-between gap-3">
-            <div className="text-xs text-warmGray-600">
-              <span className="font-semibold">Replying to</span>{' '}
-              {replyTo.sender?.username || 'message'}: {replyTo.content}
+          <div className="mb-3 px-4 py-3 rounded-xl bg-primary-50 border border-primary-200 flex items-start justify-between gap-3">
+            <div className="flex-1">
+              <div className="text-xs font-semibold text-primary-700 mb-1">Replying to {replyTo.sender?.username || 'message'}</div>
+              <div className="text-sm text-warmGray-600 truncate">{replyTo.content}</div>
             </div>
             <button
               type="button"
               onClick={() => setReplyTo(null)}
-              className="text-warmGray-500 hover:text-warmGray-700"
+              className="text-warmGray-400 hover:text-warmGray-600 transition-colors p-1"
               title="Cancel reply"
             >
-              x
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
           </div>
         )}
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-3 items-end">
           <button
             type="button"
-            className="p-2 hover:bg-cream-200 rounded-full transition-colors shrink-0"
-            title="Attach file"
+            className="p-2.5 hover:bg-cream-100 rounded-full transition-all active:scale-95 shrink-0 mb-0.5"
+            title="Attach image"
           >
             <svg
-              className="w-5 h-5 text-warmGray-700"
+              className="w-5 h-5 text-warmGray-600"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -310,34 +328,37 @@ const ChatWindow = ({ conversation, onBack }) => {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M12 19l9 2-9-18-9 18 9-2m0 0v-8m0 8l-6-4m6 4l6-4"
+                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
               />
             </svg>
           </button>
 
-          <input
-            type="text"
-            value={messageContent}
-            onChange={(e) => {
-              setMessageContent(e.target.value);
-              hasTypedRef.current = true;
-              setIsTyping(true);
-              if (typingTimeoutRef.current) {
-                clearTimeout(typingTimeoutRef.current);
-              }
-              typingTimeoutRef.current = setTimeout(() => {
-                setIsTyping(false);
-              }, 2000);
-            }}
-            onBlur={() => setIsTyping(false)}
-            placeholder="Type a message..."
-            className="flex-1 rounded-full border border-cream-300 bg-cream-50 px-4 py-2 text-sm text-warmGray-900 placeholder:text-warmGray-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
-          />
+          <div className="flex-1 relative">
+            <input
+              type="text"
+              value={messageContent}
+              onChange={(e) => {
+                setMessageContent(e.target.value);
+                hasTypedRef.current = true;
+                setIsTyping(true);
+                if (typingTimeoutRef.current) {
+                  clearTimeout(typingTimeoutRef.current);
+                }
+                typingTimeoutRef.current = setTimeout(() => {
+                  setIsTyping(false);
+                }, 2000);
+              }}
+              onBlur={() => setIsTyping(false)}
+              placeholder="Type a message..."
+              className="w-full rounded-full border border-cream-300 bg-cream-50 pl-4 pr-4 py-3 text-sm text-warmGray-900 placeholder:text-warmGray-400 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-transparent transition-all"
+            />
+          </div>
 
           <button
             type="submit"
             disabled={!messageContent.trim()}
-            className="px-4 py-2 rounded-full bg-primary-500 text-white text-sm font-medium hover:bg-primary-600 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="p-3 rounded-full bg-primary-500 text-white font-medium hover:bg-primary-600 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary-500 transition-all shrink-0 shadow-md hover:shadow-lg"
+            title="Send message"
           >
             <svg
               className="w-5 h-5"
@@ -349,7 +370,7 @@ const ChatWindow = ({ conversation, onBack }) => {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M12 19l9 2-9-18-9 18 9-2m0 0v-8m0 8l-6-4m6 4l6-4"
+                d="M12 19l9 2-9-18-9 18 9-2m0 0v-8"
               />
             </svg>
           </button>

@@ -243,7 +243,7 @@ export const searchPosts = async (req, res) => {
 };
 
 /**
- * Get trending posts (most liked in last 7 days)
+ * Get trending posts (most liked in last 7 days, fallback to recent posts)
  * @route GET /posts/trending?limit=10
  * @access Private
  */
@@ -255,12 +255,25 @@ export const getTrendingPosts = async (req, res) => {
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-    const posts = await Post.find({ 
+    let posts = await Post.find({ 
       createdAt: { $gte: sevenDaysAgo } 
     })
       .sort({ likesCount: -1, createdAt: -1 })
       .limit(limit)
       .populate("author", "username profileImage");
+
+    // If not enough trending posts, fill with recent posts
+    if (posts.length < limit) {
+      const recentPosts = await Post.find()
+        .sort({ createdAt: -1 })
+        .limit(limit)
+        .populate("author", "username profileImage");
+      
+      // Merge and deduplicate
+      const postIds = new Set(posts.map(p => p._id.toString()));
+      const additionalPosts = recentPosts.filter(p => !postIds.has(p._id.toString()));
+      posts = [...posts, ...additionalPosts].slice(0, limit);
+    }
 
     res.json({ posts });
   } catch (err) {
