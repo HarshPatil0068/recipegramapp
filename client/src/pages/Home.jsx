@@ -27,95 +27,70 @@ const Home = () => {
   }, [fetchFeed, hasFeedSlice]);
 
   return (
-    <div className="min-h-screen bg-cream-50">
-      <div className="max-w-2xl mx-auto px-3 sm:px-4 py-5 space-y-4">
-        <div className="card px-4 py-3 flex items-center justify-between border border-cream-300 bg-white">
-          <div>
-            <h1 className="text-lg sm:text-xl font-semibold text-warmGray-900">Home</h1>
-            <p className="text-xs text-warmGray-500 mt-0.5">Recipes and reels from your network</p>
+    <div className="page-shell">
+      <div className="mx-auto max-w-[640px] space-y-5">
+        <div className="ig-card px-5 py-4">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[rgb(var(--color-text-faint))]">Home</p>
+              <h1 className="mt-1 text-2xl font-extrabold text-black">Create posts</h1>
+              <p className="mt-1 text-sm text-[rgb(var(--color-text-soft))]">Share a recipe photo or reel with your people.</p>
+            </div>
+            <button onClick={() => setIsModalOpen(true)} className="btn-primary rounded-full px-5">
+              Create
+            </button>
           </div>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="btn-primary rounded-full px-5 py-2 text-sm"
-          >
-            Create
-          </button>
         </div>
 
-        {/* Error Alert */}
         {error && (
-          <div className="card bg-red-50 border border-red-200 px-6 py-4 animate-fade-in">
-            <div className="flex items-start gap-3">
-              <svg className="w-5 h-5 text-red-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <div>
-                <p className="font-semibold text-red-900">Error Loading Feed</p>
-                <p className="text-red-700 text-sm mt-1">{error}</p>
-              </div>
+          <div className="ig-card flex items-start gap-3 border-red-200 bg-red-50 p-4 text-red-700">
+            <svg className="mt-0.5 h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <p className="font-semibold">Couldn&apos;t load your feed</p>
+              <p className="mt-1 text-sm">{error}</p>
             </div>
           </div>
         )}
-        
-        {/* Loading State */}
+
         {loading && safePosts.length === 0 ? (
-          <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <PostCardSkeleton key={i} />
+          <div className="space-y-5">
+            {[1, 2, 3].map((item) => (
+              <PostCardSkeleton key={item} />
             ))}
           </div>
         ) : safePosts.length === 0 ? (
-          /* Empty State */
-          <div className="card text-center py-14 px-8 border border-cream-300 bg-white">
-            <div className="mb-6">
-              <div className="w-20 h-20 mx-auto bg-cream-200 rounded-full flex items-center justify-center mb-6">
-                <svg className="w-12 h-12 text-warmGray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </div>
+          <div className="ig-card p-8 text-center">
+            <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-[rgb(var(--color-surface-muted))]">
+              <svg className="h-10 w-10 text-[rgb(var(--color-text-soft))]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2 1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
             </div>
-            <h2 className="text-2xl font-semibold text-warmGray-900 mb-3">Feed is empty</h2>
-            <p className="text-warmGray-600 mb-2 max-w-md mx-auto leading-relaxed">
-              Start following users to see their delicious recipes and updates here.
+            <h2 className="text-2xl font-bold text-black">Your feed is still preheating</h2>
+            <p className="mt-2 text-sm text-[rgb(var(--color-text-soft))]">
+              Follow more creators or drop your first recipe so the timeline starts feeling alive.
             </p>
-            <p className="text-warmGray-500 text-sm mb-7 max-w-md mx-auto">
-              Or create your own recipe post to inspire others!
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <button
-                onClick={() => setIsModalOpen(true)}
-                className="btn-primary rounded-full px-8"
-              >
-                Share Your Recipe
+            <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
+              <button onClick={() => setIsModalOpen(true)} className="btn-primary rounded-full px-6">
+                Share a recipe
               </button>
-              <Link
-                to="/explore"
-                className="btn-outline rounded-full px-8 text-center"
-              >
-                Explore Recipes
+              <Link to="/explore" className="btn-outline rounded-full px-6">
+                Explore posts
               </Link>
             </div>
           </div>
         ) : (
-          /* Posts List */
-          <div className="space-y-4">
+          <div className="space-y-5">
             {safePosts.map((post) => (
               <PostCard key={post?._id} post={post} />
             ))}
-            {loading && (
-              <div className="space-y-4">
-                <PostCardSkeleton />
-              </div>
-            )}
+            {loading && <PostCardSkeleton />}
           </div>
         )}
       </div>
 
-      {/* Create Post Modal */}
-      <CreatePostModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-      />
+      <CreatePostModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
 };

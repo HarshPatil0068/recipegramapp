@@ -1,34 +1,28 @@
 import { useState, useRef } from 'react';
 
-/**
- * FileUploadBox - A reusable component for file uploads with drag-drop support
- * Features: drag-drop, file preview, file type validation
- */
 const FileUploadBox = ({
   onFileSelect,
-  accept = "image/*,video/*",
-  label = "Upload Media",
-  maxSize = 50 * 1024 * 1024, // 50MB
+  accept = 'image/*,video/*',
+  label = 'Upload Media',
+  maxSize = 50 * 1024 * 1024,
   isLoading = false,
-  preview = null
+  preview = null,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState('');
   const fileInputRef = useRef(null);
 
   const validateFile = (file) => {
-    // Check file size
     if (file.size > maxSize) {
       setError(`File size must be less than ${Math.round(maxSize / 1024 / 1024)}MB`);
       return false;
     }
 
-    // Check file type based on accept attribute
-    const acceptTypes = accept.split(',').map(type => type.trim());
-    const isAllowed = acceptTypes.some(type => {
+    const acceptTypes = accept.split(',').map((type) => type.trim());
+    const isAllowed = acceptTypes.some((type) => {
       if (type.includes('/*')) {
         const baseType = type.split('/')[0];
-        return file.type.startsWith(baseType + '/');
+        return file.type.startsWith(`${baseType}/`);
       }
       return file.type === type;
     });
@@ -43,100 +37,69 @@ const FileUploadBox = ({
 
   const handleFile = (file) => {
     setError('');
-    if (validateFile(file)) {
-      onFileSelect(file);
-    }
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = () => {
-    setIsDragging(false);
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setIsDragging(false);
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
-      handleFile(files[0]);
-    }
-  };
-
-  const handleInputChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      handleFile(e.target.files[0]);
-    }
+    if (validateFile(file)) onFileSelect(file);
   };
 
   return (
     <div className="w-full">
-      {/* File Input Area */}
       <div
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setIsDragging(true);
+        }}
+        onDragLeave={() => setIsDragging(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setIsDragging(false);
+          const files = e.dataTransfer.files;
+          if (files.length > 0) handleFile(files[0]);
+        }}
         onClick={() => !isLoading && fileInputRef.current?.click()}
-        className={`relative border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all duration-200 ${
+        className={`relative rounded-[24px] border-2 border-dashed p-8 text-center transition ${
           isDragging
-            ? 'border-blue-500 bg-blue-50'
-            : 'border-warmGray-300 hover:border-warmGray-400 bg-warmGray-50 hover:bg-warmGray-100'
-        } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            ? 'border-[rgb(var(--color-primary))] bg-sky-50'
+            : 'border-[rgb(var(--color-border))] bg-[rgb(var(--color-app))] hover:bg-[rgb(var(--color-surface-muted))]'
+        } ${isLoading ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}`}
       >
         <input
           ref={fileInputRef}
           type="file"
-          onChange={handleInputChange}
+          onChange={(e) => {
+            if (e.target.files?.[0]) handleFile(e.target.files[0]);
+          }}
           accept={accept}
           disabled={isLoading}
           className="hidden"
         />
 
-        {/* Upload Icon */}
-        <div className="mb-3">
-          <svg className="w-12 h-12 mx-auto text-warmGray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white">
+          <svg className="h-8 w-8 text-[rgb(var(--color-text-soft))]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M12 13v9m0 0-3-3m3 3 3-3" />
           </svg>
         </div>
 
-        {/* Text */}
-        <p className="text-warmGray-900 font-semibold mb-1">{label}</p>
-        <p className="text-sm text-warmGray-600">or drag and drop your file here</p>
-        <p className="text-xs text-warmGray-500 mt-2">Supported: Images & Videos (max {Math.round(maxSize / 1024 / 1024)}MB)</p>
+        <p className="text-base font-bold text-black">{label}</p>
+        <p className="mt-1 text-sm text-[rgb(var(--color-text-soft))]">Drag it here or click to browse</p>
+        <p className="mt-2 text-xs font-medium text-[rgb(var(--color-text-faint))]">
+          Images and videos up to {Math.round(maxSize / 1024 / 1024)}MB
+        </p>
 
-        {/* Loading State */}
         {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white/80 rounded-lg">
-            <div className="animate-spin">
-              <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-            </div>
+          <div className="absolute inset-0 flex items-center justify-center rounded-[24px] bg-white/85">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-[rgb(var(--color-primary))] border-t-transparent" />
           </div>
         )}
       </div>
 
-      {/* Error Message */}
-      {error && (
-        <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-          {error}
-        </div>
-      )}
+      {error && <div className="mt-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
 
-      {/* Preview */}
       {preview && (
-        <div className="mt-4">
-          <p className="text-sm font-medium text-warmGray-700 mb-2">Preview:</p>
-          <div className="rounded-lg overflow-hidden bg-warmGray-100 max-h-64">
-            {preview.type.startsWith('image/') ? (
-              <img src={preview.url} alt="Preview" className="w-full h-auto object-cover" />
-            ) : (
-              <video src={preview.url} className="w-full h-auto" controls muted />
-            )}
-          </div>
+        <div className="mt-4 overflow-hidden rounded-[24px] border border-[rgb(var(--color-border))] bg-[rgb(var(--color-app))]">
+          {preview.type.startsWith('image/') ? (
+            <img src={preview.url} alt="Preview" className="max-h-80 w-full object-cover" />
+          ) : (
+            <video src={preview.url} className="max-h-80 w-full" controls muted />
+          )}
         </div>
       )}
     </div>

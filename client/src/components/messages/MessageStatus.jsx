@@ -6,11 +6,11 @@
  * - Delivered: Double checkmark (gray)
  * - Read: Double checkmark (blue)
  */
-const MessageStatus = ({ status, isRead, className = "" }) => {
+const MessageStatus = ({ status, isRead, className = '' }) => {
   if (status === 'sending') {
     return (
       <svg
-        className={`w-4 h-4 text-warmGray-400 ${className}`}
+        className={`text-[rgb(var(--color-text-faint))] ${className}`}
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -28,7 +28,7 @@ const MessageStatus = ({ status, isRead, className = "" }) => {
   if (status === 'sent') {
     return (
       <svg
-        className={`w-4 h-4 text-warmGray-400 ${className}`}
+        className={`text-[rgb(var(--color-text-faint))] ${className}`}
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -46,7 +46,7 @@ const MessageStatus = ({ status, isRead, className = "" }) => {
   if (status === 'delivered') {
     return (
       <svg
-        className={`w-4 h-4 text-warmGray-400 ${className}`}
+        className={`text-[rgb(var(--color-text-faint))] ${className}`}
         viewBox="0 0 16 16"
         fill="currentColor"
       >
@@ -59,7 +59,7 @@ const MessageStatus = ({ status, isRead, className = "" }) => {
   if (status === 'read' || isRead) {
     return (
       <svg
-        className={`w-4 h-4 text-primary-500 ${className}`}
+        className={`text-[rgb(var(--color-primary))] ${className}`}
         viewBox="0 0 16 16"
         fill="currentColor"
       >

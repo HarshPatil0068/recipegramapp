@@ -12,22 +12,22 @@ const Explore = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    const fetchTrendingPosts = async () => {
+      try {
+        setLoading(true);
+        setError('');
+        const response = await postService.getTrendingPosts(20);
+        setTrendingPosts(response.posts || []);
+      } catch (fetchError) {
+        console.error('Error fetching trending posts:', fetchError);
+        setError(fetchError.message || 'Failed to fetch trending posts');
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchTrendingPosts();
   }, []);
-
-  const fetchTrendingPosts = async () => {
-    try {
-      setLoading(true);
-      setError('');
-      const response = await postService.getTrendingPosts(20);
-      setTrendingPosts(response.posts || []);
-    } catch (error) {
-      console.error('Error fetching trending posts:', error);
-      setError(error.message || 'Failed to fetch trending posts');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -37,11 +37,10 @@ const Explore = () => {
       setSearching(true);
       setError('');
       const response = await postService.searchPosts(searchQuery, 1, 20);
-      const [searching, setSearching] = useState(false);
-      const [error, setError] = useState('');
-      const [activeFilter, setActiveFilter] = useState('all');
-      console.error('Error searching posts:', error);
-      setError(error.message || 'Failed to search posts');
+      setSearchResults(response.posts || []);
+    } catch (searchError) {
+      console.error('Error searching posts:', searchError);
+      setError(searchError.message || 'Failed to search posts');
     } finally {
       setSearching(false);
     }
@@ -57,104 +56,51 @@ const Explore = () => {
   const isSearchActive = searchQuery.trim().length > 0;
 
   return (
-    <div className="max-w-6xl mx-auto py-6 px-4">
-      <div className="mb-10">
-        <h1 className="text-2xl md:text-3xl font-semibold text-warmGray-900 tracking-tight mb-2">Explore</h1>
-        <p className="text-warmGray-600">Discover trending recipes and new ideas</p>
-        
-        {/* Search Bar */}
-        <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-2 mt-6">
-          <div className="relative flex-1">
-            <input
-              type="text"
-              value={searchQuery}
-              placeholder="Search recipes by name or ingredients..."
-              className="input pl-12"
-            />
-            <svg 
-              className="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-warmGray-400" 
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
+    <div className="page-shell">
+      <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[rgb(var(--color-text-faint))]">Explore</p>
+          <h1 className="mt-1 text-3xl font-extrabold text-black">Trending recipes and reels</h1>
+          <p className="mt-2 text-sm text-[rgb(var(--color-text-soft))]">Browse what the community is saving, liking, and replaying.</p>
+        </div>
+
+        <form onSubmit={handleSearch} className="flex w-full max-w-xl gap-2">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search recipes, captions, ingredients..."
+            className="input flex-1"
+          />
           {isSearchActive ? (
-            <button
-              type="button"
-              onClick={clearSearch}
-              className="btn-outline rounded-full w-full sm:w-auto"
-            >
+            <button type="button" onClick={clearSearch} className="btn-outline rounded-full px-5">
               Clear
             </button>
           ) : (
-            <button
-              type="submit"
-              disabled={searching || !searchQuery.trim()}
-              className="btn-primary rounded-full w-full sm:w-auto"
-            >
+            <button type="submit" disabled={searching || !searchQuery.trim()} className="btn-primary rounded-full px-5">
               {searching ? 'Searching...' : 'Search'}
             </button>
           )}
         </form>
       </div>
 
-      {error && (
-        <div className="card bg-error-50 border-error-200 text-error-700 px-6 py-4 mb-6">
-          <div className="flex items-center gap-2">
-            <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <p><strong>Error:</strong> {error}</p>
-          </div>
-        </div>
-      )}
+      {error && <div className="mb-5 rounded-[24px] border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">{error}</div>}
 
-      {/* Section Title */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold text-warmGray-900">
-          {isSearchActive ? `Search Results${searchResults.length > 0 ? ` (${searchResults.length})` : ''}` : 'Trending Recipes'}
-        </h2>
-        {!isSearchActive && (
-          <p className="text-sm text-warmGray-600 mt-2">Most popular recipes from the community</p>
-        )}
-      </div>
-
-      {/* Posts Grid */}
       {loading || searching ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <PostCardSkeleton />
-          <PostCardSkeleton />
-          <PostCardSkeleton />
-          <PostCardSkeleton />
-          <PostCardSkeleton />
-          <PostCardSkeleton />
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          {[1, 2, 3, 4, 5, 6].map((item) => (
+            <PostCardSkeleton key={item} />
+          ))}
         </div>
       ) : displayPosts.length === 0 ? (
-        <div className="text-center py-12 card">
-          <div className="mb-4">
-            <svg className="w-24 h-24 mx-auto text-warmGray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
-          <h3 className="text-xl font-semibold text-warmGray-700 mb-2">
-            {isSearchActive ? 'No recipes found' : 'No trending recipes yet'}
-          </h3>
-          <p className="text-warmGray-500 mb-4">
-            {isSearchActive ? `No recipes match "${searchQuery}"` : 'Check back later for trending content'}
+        <div className="ig-card p-10 text-center">
+          <h2 className="text-2xl font-bold text-black">{isSearchActive ? 'No recipes found' : 'Nothing trending yet'}</h2>
+          <p className="mt-2 text-sm text-[rgb(var(--color-text-soft))]">
+            {isSearchActive ? `No results for "${searchQuery}".` : 'Check back soon for community favorites.'}
           </p>
-          {isSearchActive && (
-            <button
-              onClick={clearSearch}
-              className="btn-primary"
-            >
-              View All Trending
-            </button>
-          )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {displayPosts.map((post) => (
             <PostCard key={post._id} post={post} />
           ))}

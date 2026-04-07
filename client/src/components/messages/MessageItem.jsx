@@ -1,4 +1,5 @@
 import { formatDistanceToNow } from '../../utils/helpers';
+import MessageStatus from './MessageStatus';
 
 const MessageItem = ({ message, isOwn, onReply, isLastOwn }) => {
   const showSeen = isOwn && isLastOwn && message.isRead;
@@ -6,72 +7,58 @@ const MessageItem = ({ message, isOwn, onReply, isLastOwn }) => {
 
   return (
     <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'} px-1`}>
-      <div className={`flex flex-col ${isOwn ? 'items-end' : 'items-start'} max-w-[75%] sm:max-w-md`}>
+      <div className={`flex max-w-[84%] flex-col ${isOwn ? 'items-end' : 'items-start'} sm:max-w-md`}>
         <div
-          className={`px-4 py-2.5 rounded-2xl transition-all ${
+          className={`rounded-3xl px-4 py-3 transition ${
             isOwn
-              ? 'bg-primary-500 text-white rounded-br-sm'
-              : 'bg-white text-warmGray-900 rounded-bl-sm border border-cream-300'
-          } ${isOptimistic ? 'opacity-70' : 'opacity-100'} break-words`}
+              ? 'rounded-br-md bg-[rgb(var(--color-primary))] text-white'
+              : 'rounded-bl-md border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] text-[rgb(var(--color-text))]'
+          } ${isOptimistic ? 'opacity-75' : 'opacity-100'} break-words shadow-sm`}
         >
           {message.parentMessage && (
             <div
-              className={`mb-2 px-3 py-2 rounded-xl text-xs border ${
+              className={`mb-2 rounded-2xl border px-3 py-2 text-xs ${
                 isOwn
-                  ? 'bg-primary-600/50 border-primary-400/30 text-white'
-                  : 'bg-cream-50 border-cream-200 text-warmGray-600'
+                  ? 'border-white/20 bg-white/10 text-white'
+                  : 'border-[rgb(var(--color-border))] bg-[rgb(var(--color-app))] text-[rgb(var(--color-text-soft))]'
               }`}
             >
-              <div className="flex items-center gap-1 mb-1">
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="mb-1 flex items-center gap-1">
+                <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
                 </svg>
-                <span className="font-semibold">
-                  {message.parentMessage.sender?.username || 'User'}
-                </span>
+                <span className="font-semibold">{message.parentMessage.sender?.username || 'User'}</span>
               </div>
               <div className="truncate opacity-90">{message.parentMessage.content}</div>
             </div>
           )}
+
           {message.image && (
-            <img
-              src={message.image}
-              alt="Message attachment"
-              className="max-w-full rounded-xl mb-2 shadow-sm"
-            />
+            <img src={message.image} alt="Message attachment" className="mb-2 max-w-full rounded-2xl shadow-sm" />
           )}
-          <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+
+          <p className="whitespace-pre-wrap text-sm leading-6">{message.content}</p>
         </div>
 
-        <div className={`mt-1.5 flex items-center gap-3 px-1 ${isOwn ? 'justify-end' : 'justify-start'}`}>
-          <p className="text-xs text-warmGray-400 font-medium">
+        <div className={`mt-1.5 flex items-center gap-2 px-1 ${isOwn ? 'justify-end' : 'justify-start'}`}>
+          <p className="text-[11px] font-medium text-[rgb(var(--color-text-faint))]">
             {formatDistanceToNow(new Date(message.createdAt))}
           </p>
           {onReply && !isOptimistic && (
             <button
               type="button"
               onClick={() => onReply(message)}
-              className="text-xs text-warmGray-400 hover:text-primary-500 font-medium transition-colors"
+              className="text-[11px] font-semibold text-[rgb(var(--color-text-faint))] transition hover:text-[rgb(var(--color-primary))]"
             >
               Reply
             </button>
           )}
-          {isOptimistic && (
-            <span className="text-xs text-warmGray-400 flex items-center gap-1">
-              <svg className="w-3 h-3 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              Sending
-            </span>
-          )}
+          {isOwn && <MessageStatus status={message.status} isRead={message.isRead} className="h-3.5 w-3.5" />}
         </div>
 
         {showSeen && (
           <div className="mt-1 flex items-center gap-1 px-1">
-            <svg className="w-3 h-3 text-primary-500" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-            </svg>
-            <span className="text-xs text-primary-500 font-medium">Seen</span>
+            <span className="text-[11px] font-semibold text-[rgb(var(--color-primary))]">Seen</span>
           </div>
         )}
       </div>

@@ -11,95 +11,68 @@ const SavedPosts = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    const fetchSavedPosts = async () => {
+      try {
+        setLoading(true);
+        setError('');
+        const response = await saveService.getSavedPosts(page, 12);
+        setPosts(response.posts || []);
+        setTotalPages(response.totalPages || 1);
+      } catch (fetchError) {
+        console.error('Error fetching saved posts:', fetchError);
+        setError(fetchError.message || 'Failed to fetch saved posts');
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchSavedPosts();
   }, [page]);
 
-  const fetchSavedPosts = async () => {
-    try {
-      setLoading(true);
-      setError('');
-      const response = await saveService.getSavedPosts(page, 12);
-      setPosts(response.posts || []);
-      setTotalPages(response.totalPages || 1);
-    } catch (error) {
-      console.error('Error fetching saved posts:', error);
-      setError(error.message || 'Failed to fetch saved posts');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   if (loading && page === 1) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-cream-300 border-t-primary-500 mb-4"></div>
-          <div className="text-xl text-warmGray-600">Loading saved posts...</div>
-        </div>
+      <div className="page-shell flex min-h-[70vh] items-center justify-center">
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-[rgb(var(--color-border))] border-t-[rgb(var(--color-primary))]" />
       </div>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto py-6 px-4">
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2 flex-wrap">
-          <svg className="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-          </svg>
-          <h1 className="text-2xl md:text-3xl font-semibold text-warmGray-900">Saved Posts</h1>
+    <div className="page-shell">
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[rgb(var(--color-text-faint))]">Saved</p>
+          <h1 className="mt-1 text-3xl font-extrabold text-black">Your saved collection</h1>
+          <p className="mt-2 text-sm text-[rgb(var(--color-text-soft))]">Everything you bookmarked for later inspiration.</p>
         </div>
-        <p className="text-warmGray-600 sm:ml-11">Your collection of saved recipes ({posts.length} {posts.length === 1 ? 'recipe' : 'recipes'})</p>
+        <div className="stats-chip"><span className="font-bold text-black">{posts.length}</span> on this page</div>
       </div>
 
-      {error && (
-        <div className="card bg-error-50 border-error-200 text-error-700 px-4 py-3 rounded mb-4">
-          <strong>Error:</strong> {error}
-        </div>
-      )}
+      {error && <div className="mb-5 rounded-[24px] border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">{error}</div>}
 
       {posts.length === 0 ? (
-        <div className="text-center py-12 card">
-          <div className="mb-4">
-            <svg className="w-24 h-24 mx-auto text-warmGray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-            </svg>
-          </div>
-          <h2 className="text-2xl font-semibold text-warmGray-700 mb-2">No Saved Posts Yet</h2>
-          <p className="text-warmGray-500 mb-6 max-w-md mx-auto">Save recipes you love by clicking the bookmark icon on any post to view them here later</p>
-          <Link
-            to="/explore"
-            className="inline-block btn-primary"
-          >
-            Discover Recipes
+        <div className="ig-card p-10 text-center">
+          <h2 className="text-2xl font-bold text-black">No saved posts yet</h2>
+          <p className="mt-2 text-sm text-[rgb(var(--color-text-soft))]">Tap the bookmark icon on any post to build your own recipe vault.</p>
+          <Link to="/explore" className="btn-primary mt-6 rounded-full px-6">
+            Discover posts
           </Link>
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {posts.map((post) => (
               <PostCard key={post._id} post={post} />
             ))}
           </div>
 
-          {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex justify-center gap-2">
-              <button
-                onClick={() => setPage(p => Math.max(1, p - 1))}
-                disabled={page === 1}
-                  className="px-4 py-2 bg-warmGray-200 rounded-full text-warmGray-800 hover:bg-warmGray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
+            <div className="mt-8 flex items-center justify-center gap-3">
+              <button onClick={() => setPage((prev) => Math.max(1, prev - 1))} disabled={page === 1} className="btn-outline rounded-full px-5 disabled:opacity-50">
                 Previous
               </button>
-              <span className="px-4 py-2 text-warmGray-700">
-                Page {page} of {totalPages}
-              </span>
-              <button
-                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                disabled={page === totalPages}
-                className="px-4 py-2 bg-warmGray-200 rounded-full text-warmGray-800 hover:bg-warmGray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
+              <span className="text-sm font-medium text-[rgb(var(--color-text-soft))]">Page {page} of {totalPages}</span>
+              <button onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))} disabled={page === totalPages} className="btn-outline rounded-full px-5 disabled:opacity-50">
                 Next
               </button>
             </div>

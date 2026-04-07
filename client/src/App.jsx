@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import store from './store/store';
 import { ToastProvider } from './context/ToastContext';
@@ -16,7 +16,35 @@ import Explore from './pages/Explore';
 import Messages from './pages/Messages';
 import SavedPosts from './pages/SavedPosts';
 import Reels from './pages/Reels';
+import AIChef from './pages/AIChef';
 import './index.css';
+
+const AppLayout = () => {
+  const location = useLocation();
+  const isAuthPage = ['/login', '/register'].includes(location.pathname);
+
+  return (
+    <div className="app-shell">
+      {!isAuthPage && <Header />}
+      <main className={isAuthPage ? '' : 'pt-4 md:pt-6 pb-20 md:pb-8'}>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+          <Route path="/profile/:username" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/post/:postId" element={<ProtectedRoute><PostDetail /></ProtectedRoute>} />
+          <Route path="/search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
+          <Route path="/explore" element={<ProtectedRoute><Explore /></ProtectedRoute>} />
+          <Route path="/reels" element={<ProtectedRoute><Reels /></ProtectedRoute>} />
+          <Route path="/saved" element={<ProtectedRoute><SavedPosts /></ProtectedRoute>} />
+          <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
+          <Route path="/ai-chef" element={<ProtectedRoute><AIChef /></ProtectedRoute>} />
+        </Routes>
+      </main>
+      {!isAuthPage && <Navigation />}
+    </div>
+  );
+};
 
 function App() {
   return (
@@ -24,84 +52,11 @@ function App() {
       <ToastProvider>
         <AuthInitializer>
           <Router>
-            <div className="min-h-screen bg-cream-50">
-              <Header />
-              <main className="pb-16 md:pb-0 pt-4">
-                <Routes>
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route
-                  path="/"
-                  element={
-                    <ProtectedRoute>
-                      <Home />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/profile/:username"
-                  element={
-                    <ProtectedRoute>
-                      <Profile />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/post/:postId"
-                  element={
-                    <ProtectedRoute>
-                      <PostDetail />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/search"
-                  element={
-                    <ProtectedRoute>
-                      <Search />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/explore"
-                  element={
-                    <ProtectedRoute>
-                      <Explore />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/reels"
-                  element={
-                    <ProtectedRoute>
-                      <Reels />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/saved"
-                  element={
-                    <ProtectedRoute>
-                      <SavedPosts />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/messages"
-                  element={
-                    <ProtectedRoute>
-                      <Messages />
-                    </ProtectedRoute>
-                  }
-                />
-              </Routes>
-            </main>
-            <Navigation />
-          </div>
-        </Router>
-      </AuthInitializer>
-    </ToastProvider>
-  </Provider>
+            <AppLayout />
+          </Router>
+        </AuthInitializer>
+      </ToastProvider>
+    </Provider>
   );
 }
 

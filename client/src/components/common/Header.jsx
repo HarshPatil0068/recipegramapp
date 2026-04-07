@@ -2,15 +2,21 @@ import { Link, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../../hooks';
+import { getPreferredTheme, persistTheme } from '../../utils/theme';
 
 const Header = () => {
   const { isAuthenticated, user } = useSelector((state) => state.auth);
   const { logout } = useAuth();
   const location = useLocation();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [theme, setTheme] = useState(() => getPreferredTheme());
   const userMenuRef = useRef(null);
 
-  const isActivePath = (path) => location.pathname === path;
+  const navItems = [
+    { path: '/', label: 'Home' },
+    { path: '/explore', label: 'Explore' },
+    { path: '/ai-chef', label: 'AI Chef' },
+  ];
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -23,125 +29,122 @@ const Header = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  return (
-    <header className="sticky top-0 z-50 border-b border-cream-300 bg-cream-50/95 backdrop-blur-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link 
-            to="/" 
-            className="group flex items-center gap-2"
-          >
-            <div className="flex items-center justify-center w-9 h-9 rounded-full bg-primary-100 border border-primary-200">
-              <svg className="w-5 h-5 text-primary-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-            </div>
-            <span className="text-2xl font-semibold text-warmGray-900 tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
-              RecipeGram
-            </span>
-          </Link>
+  const toggleTheme = () => {
+    const nextTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(nextTheme);
+    persistTheme(nextTheme);
+  };
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-2">
+  return (
+    <header className="sticky top-0 z-50 border-b border-[rgb(var(--color-border))] bg-white/88 backdrop-blur-xl">
+      <div className="container-custom">
+        <div className="flex h-16 items-center justify-between gap-6">
+          <div className="flex min-w-0 items-center gap-8">
+            <Link to="/" className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-300 via-pink-400 to-fuchsia-500 text-sm font-extrabold text-white shadow-sm">
+                RG
+              </div>
+              <div className="min-w-0">
+                <div className="logo-script text-[2rem] text-black">RecipeGram</div>
+              </div>
+            </Link>
+
+            {isAuthenticated && (
+              <nav className="hidden lg:flex items-center gap-6">
+                {navItems.map((item) => {
+                  const isActive = location.pathname === item.path;
+                  return (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      className={`relative py-2 text-sm font-semibold transition ${
+                        isActive ? 'text-black' : 'text-[rgb(var(--color-text-soft))] hover:text-black'
+                      }`}
+                    >
+                      {item.label}
+                      {isActive && <span className="absolute inset-x-0 -bottom-[9px] mx-auto h-0.5 w-full rounded-full bg-black" />}
+                    </Link>
+                  );
+                })}
+              </nav>
+            )}
+          </div>
+
+          <div className="flex items-center gap-3">
             {isAuthenticated ? (
               <>
-                <Link 
-                  to="/" 
-                  className={`px-3 py-2 rounded-full text-sm font-medium transition-colors ${
-                    isActivePath('/') 
-                      ? 'bg-primary-100 text-primary-800' 
-                      : 'text-warmGray-700 hover:bg-cream-100 hover:text-warmGray-900'
-                  }`}
-                >
-                  Home
-                </Link>
-                <Link 
-                  to="/explore" 
-                  className={`px-3 py-2 rounded-full text-sm font-medium transition-colors ${
-                    isActivePath('/explore') 
-                      ? 'bg-primary-100 text-primary-800' 
-                      : 'text-warmGray-700 hover:bg-cream-100 hover:text-warmGray-900'
-                  }`}
-                >
-                  Explore
-                </Link>
                 <Link
-                  to="/reels"
-                  className={`px-3 py-2 rounded-full text-sm font-medium transition-colors ${
-                    isActivePath('/reels')
-                      ? 'bg-primary-100 text-primary-800'
-                      : 'text-warmGray-700 hover:bg-cream-100 hover:text-warmGray-900'
-                  }`}
+                  to="/search"
+                  className="hidden md:flex items-center gap-2 rounded-full bg-[rgb(var(--color-app))] px-4 py-2 text-sm font-medium text-[rgb(var(--color-text-soft))] transition hover:bg-[rgb(var(--color-surface-muted))] hover:text-black"
                 >
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  Search creators
+                </Link>
+
+                <Link to="/reels" className="hidden md:inline-flex btn-ghost rounded-full px-3">
                   Reels
                 </Link>
-                <Link 
-                  to="/search" 
-                  className={`px-3 py-2 rounded-full text-sm font-medium transition-colors ${
-                    isActivePath('/search') 
-                      ? 'bg-primary-100 text-primary-800' 
-                      : 'text-warmGray-700 hover:bg-cream-100 hover:text-warmGray-900'
-                  }`}
-                >
-                  Search
-                </Link>
-                <Link 
-                  to="/messages" 
-                  className={`px-3 py-2 rounded-full text-sm font-medium transition-colors ${
-                    isActivePath('/messages') 
-                      ? 'bg-primary-100 text-primary-800' 
-                      : 'text-warmGray-700 hover:bg-cream-100 hover:text-warmGray-900'
-                  }`}
-                >
+
+                <Link to="/messages" className="hidden xl:inline-flex btn-ghost rounded-full px-3">
                   Messages
                 </Link>
-                <div className="w-px h-6 bg-cream-300 mx-1" />
+
+                <Link to="/saved" className="hidden xl:inline-flex btn-ghost rounded-full px-3">
+                  Saved
+                </Link>
+
                 <div className="relative" ref={userMenuRef}>
                   <button
                     onClick={() => setIsUserMenuOpen((prev) => !prev)}
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-full font-medium text-warmGray-700 hover:bg-cream-100 transition-colors"
+                    className="flex items-center gap-2 rounded-full bg-white px-1 py-1 pr-2 transition hover:bg-[rgb(var(--color-app))]"
                   >
-                    <div className="avatar w-8 h-8 text-xs">
+                    <div className="avatar h-9 w-9 text-xs">
                       {user?.profileImage ? (
-                        <img 
-                          src={user.profileImage} 
-                          alt={user.username} 
-                          className="w-full h-full rounded-full object-cover"
-                        />
+                        <img src={user.profileImage} alt={user.username} className="h-full w-full object-cover" />
                       ) : (
-                        user?.username?.charAt(0).toUpperCase()
+                        user?.username?.charAt(0).toUpperCase() || 'U'
                       )}
                     </div>
-                    <span className="hidden lg:inline">{user?.username || 'Account'}</span>
-                    <svg className="w-4 h-4 text-warmGray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
+                    <span className="hidden md:inline text-sm font-semibold text-black">
+                      {user?.username || 'Account'}
+                    </span>
                   </button>
+
                   {isUserMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-44 card p-2 z-50">
+                    <div className="absolute right-0 mt-3 w-56 rounded-2xl border border-[rgb(var(--color-border))] bg-white p-2 shadow-xl">
                       <Link
                         to="/profile/me"
                         onClick={() => setIsUserMenuOpen(false)}
-                        className="block px-3 py-2 rounded-lg text-sm text-warmGray-700 hover:bg-warmGray-50"
+                        className="block rounded-xl px-3 py-2.5 text-sm font-medium text-black hover:bg-[rgb(var(--color-surface-muted))]"
                       >
                         Profile
                       </Link>
+                      <button
+                        onClick={() => {
+                          setIsUserMenuOpen(false);
+                          toggleTheme();
+                        }}
+                        className="block w-full rounded-xl px-3 py-2.5 text-left text-sm font-medium text-black hover:bg-[rgb(var(--color-surface-muted))]"
+                      >
+                        Switch to {theme === 'light' ? 'dark' : 'light'} mode
+                      </button>
                       <Link
                         to="/saved"
                         onClick={() => setIsUserMenuOpen(false)}
-                        className="block px-3 py-2 rounded-lg text-sm text-warmGray-700 hover:bg-warmGray-50"
+                        className="block rounded-xl px-3 py-2.5 text-sm font-medium text-black hover:bg-[rgb(var(--color-surface-muted))]"
                       >
-                        Saved Recipes
+                        Saved posts
                       </Link>
                       <button
                         onClick={() => {
                           setIsUserMenuOpen(false);
                           logout();
                         }}
-                        className="w-full text-left px-3 py-2 rounded-lg text-sm text-error-600 hover:bg-error-50"
+                        className="block w-full rounded-xl px-3 py-2.5 text-left text-sm font-medium text-[rgb(var(--color-error))] hover:bg-red-50"
                       >
-                        Logout
+                        Log out
                       </button>
                     </div>
                   )}
@@ -149,21 +152,15 @@ const Header = () => {
               </>
             ) : (
               <>
-                <Link 
-                  to="/login" 
-                  className="px-4 py-2 text-warmGray-700 hover:text-warmGray-900 font-medium transition-colors"
-                >
-                  Login
+                <Link to="/login" className="btn-ghost hidden sm:inline-flex">
+                  Log in
                 </Link>
-                <Link 
-                  to="/register" 
-                  className="btn-primary rounded-full"
-                >
-                  Sign Up
+                <Link to="/register" className="btn-primary rounded-full">
+                  Sign up
                 </Link>
               </>
             )}
-          </nav>
+          </div>
         </div>
       </div>
     </header>

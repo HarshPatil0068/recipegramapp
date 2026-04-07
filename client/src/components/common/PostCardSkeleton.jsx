@@ -1,37 +1,25 @@
 const PostCardSkeleton = () => {
   return (
-    <div className="card overflow-hidden animate-pulse">
-      {/* Header skeleton */}
-      <div className="p-5 flex items-center gap-3">
-        <div className="w-11 h-11 bg-warmGray-200 rounded-full"></div>
+    <div className="ig-card overflow-hidden animate-pulse">
+      <div className="flex items-center gap-3 p-4">
+        <div className="h-10 w-10 rounded-full bg-[rgb(var(--color-surface-muted))]" />
         <div className="flex-1">
-          <div className="h-4 bg-warmGray-200 rounded w-28 mb-2"></div>
-          <div className="h-3 bg-warmGray-100 rounded w-20"></div>
+          <div className="h-3 w-28 rounded-full bg-[rgb(var(--color-surface-muted))]" />
+          <div className="mt-2 h-3 w-20 rounded-full bg-[rgb(var(--color-app))]" />
         </div>
       </div>
-
-      {/* Image skeleton */}
-      <div className="w-full h-96 bg-linear-to-br from-warmGray-200 to-warmGray-100"></div>
-
-      {/* Content skeleton */}
-      <div className="p-5 space-y-3">
-        {/* Action buttons skeleton */}
+      <div className="aspect-square w-full bg-[rgb(var(--color-surface-muted))]" />
+      <div className="space-y-3 p-4">
         <div className="flex gap-3">
-          <div className="w-10 h-10 bg-warmGray-200 rounded-lg"></div>
-          <div className="w-10 h-10 bg-warmGray-200 rounded-lg"></div>
+          <div className="h-8 w-8 rounded-full bg-[rgb(var(--color-surface-muted))]" />
+          <div className="h-8 w-8 rounded-full bg-[rgb(var(--color-surface-muted))]" />
+          <div className="h-8 w-8 rounded-full bg-[rgb(var(--color-surface-muted))]" />
         </div>
-        
-        {/* Likes count skeleton */}
-        <div className="h-4 bg-warmGray-200 rounded w-24"></div>
-        
-        {/* Caption skeleton */}
+        <div className="h-3 w-24 rounded-full bg-[rgb(var(--color-surface-muted))]" />
         <div className="space-y-2">
-          <div className="h-4 bg-warmGray-200 rounded w-full"></div>
-          <div className="h-4 bg-warmGray-100 rounded w-3/4"></div>
+          <div className="h-3 w-full rounded-full bg-[rgb(var(--color-surface-muted))]" />
+          <div className="h-3 w-2/3 rounded-full bg-[rgb(var(--color-app))]" />
         </div>
-        
-        {/* Comments link skeleton */}
-        <div className="h-3 bg-warmGray-100 rounded w-32"></div>
       </div>
     </div>
   );

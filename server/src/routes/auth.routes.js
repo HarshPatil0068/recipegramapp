@@ -5,8 +5,8 @@ import { validateRegistration, validateLogin } from "../middleware/validation.mi
 
 const router = express.Router();
 
-router.post("/register", authLimiter, validateRegistration, register);
-router.post("/login", authLimiter, validateLogin, login);
+router.post("/register", validateRegistration, register);
+router.post("/login", validateLogin, login);
 
 export default router;
     

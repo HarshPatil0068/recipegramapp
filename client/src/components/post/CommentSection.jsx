@@ -56,8 +56,8 @@ const CommentSection = ({ postId, comments, setComments }) => {
   };
 
   return (
-    <div className="mt-6 border-t border-cream-300 pt-4">
-      <h3 className="font-semibold text-warmGray-900 mb-4">Comments</h3>
+    <div className="mt-4 border-t border-[rgb(var(--color-border))] pt-4">
+      <h3 className="mb-4 text-sm font-bold uppercase tracking-[0.18em] text-black">Comments</h3>
 
       {isAuthenticated && (
         <form onSubmit={handleSubmit} className="mb-6">
@@ -73,26 +73,26 @@ const CommentSection = ({ postId, comments, setComments }) => {
             <button
               type="submit"
               disabled={loading || !newComment.trim()}
-              className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-primary rounded-full px-5 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Posting...' : 'Post'}
             </button>
           </div>
-          {error && <p className="text-error-500 text-sm mt-2">{error}</p>}
-          <p className="text-xs text-warmGray-500 mt-1">{newComment.length}/500 characters</p>
+          {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+          <p className="mt-1 text-xs text-[rgb(var(--color-text-faint))]">{newComment.length}/500 characters</p>
         </form>
       )}
 
       <div className="space-y-4">
         {safeComments.length === 0 ? (
-          <p className="text-warmGray-500 text-center py-4">No comments yet. Be the first to comment!</p>
+          <p className="py-4 text-center text-sm text-[rgb(var(--color-text-soft))]">No comments yet. Be the first to comment.</p>
         ) : (
           safeComments.map((comment) => {
             const isCommentAuthor = currentUser && comment.user?._id === currentUser._id;
             
             return (
               <div key={comment._id} className="flex gap-3">
-                <div className="w-8 h-8 bg-warmGray-200 rounded-full flex items-center justify-center font-bold text-warmGray-600 text-sm shrink-0">
+                <div className="avatar h-8 w-8 shrink-0 text-sm">
                   {comment.user?.profileImage ? (
                     <img 
                       src={comment.user.profileImage} 
@@ -104,14 +104,14 @@ const CommentSection = ({ postId, comments, setComments }) => {
                   )}
                 </div>
                 <div className="flex-1">
-                  <div className="bg-cream-200 rounded-lg px-4 py-2 border border-cream-300">
+                  <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-app))] px-4 py-3">
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold text-sm text-warmGray-900">{comment.user?.username}</span>
+                      <span className="text-sm font-semibold text-black">{comment.user?.username}</span>
                       {isCommentAuthor && (
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => handleDelete(comment._id)}
-                            className="text-error-500 hover:text-error-600 text-xs"
+                            className="text-xs text-red-600 hover:text-red-700"
                             title="Delete comment"
                           >
                             {confirmDeleteId === comment._id ? 'Confirm' : 'Delete'}
@@ -119,7 +119,7 @@ const CommentSection = ({ postId, comments, setComments }) => {
                           {confirmDeleteId === comment._id && (
                             <button
                               onClick={() => setConfirmDeleteId(null)}
-                              className="text-warmGray-500 hover:text-warmGray-700 text-xs"
+                              className="text-xs text-[rgb(var(--color-text-soft))] hover:text-black"
                               title="Cancel delete"
                             >
                               Cancel
@@ -128,9 +128,9 @@ const CommentSection = ({ postId, comments, setComments }) => {
                         </div>
                       )}
                     </div>
-                    <p className="text-warmGray-700 mt-1">{comment.text}</p>
+                    <p className="mt-1 text-sm leading-6 text-[rgb(var(--color-text))]">{comment.text}</p>
                   </div>
-                  <div className="text-xs text-warmGray-500 mt-1 px-4">
+                  <div className="mt-1 px-4 text-xs text-[rgb(var(--color-text-faint))]">
                     {new Date(comment.createdAt).toLocaleDateString()}
                   </div>
                 </div>
