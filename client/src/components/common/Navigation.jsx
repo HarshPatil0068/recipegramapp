@@ -29,6 +29,15 @@ const navItems = [
     ),
   },
   {
+    path: '/ai-chef',
+    label: 'AI Chef',
+    icon: (active) => (
+      <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={active ? 2.5 : 2} d="M9.75 3.5a1.75 1.75 0 00-3.5 0v1.25H5a2 2 0 00-2 2V9a2 2 0 002 2h1.25v2H5a2 2 0 00-2 2v2.25a1.75 1.75 0 003.5 0V17H9v1.25a1.75 1.75 0 003.5 0V17h2v1.25a1.75 1.75 0 003.5 0V17H19a2 2 0 002-2v-2a2 2 0 00-2-2h-1.25v-2H19a2 2 0 002-2V6.75a1.75 1.75 0 00-3.5 0V8H15V6.75a1.75 1.75 0 00-3.5 0V8h-2V3.5zM8 11h8v2H8v-2z" />
+      </svg>
+    ),
+  },
+  {
     path: '/messages',
     label: 'DM',
     icon: (active) => (
@@ -52,7 +61,7 @@ const Navigation = () => {
   const location = useLocation();
 
   return (
-    <nav className="fixed bottom-4 left-1/2 z-50 w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 rounded-full border border-[rgb(var(--color-border))] bg-white/94 px-3 py-2 shadow-[0_18px_40px_rgba(15,23,42,0.12)] backdrop-blur-xl md:hidden">
+    <nav className="fixed bottom-4 left-1/2 z-50 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 rounded-full border border-[rgb(var(--color-border))] bg-white/94 px-3 py-2 shadow-[0_18px_40px_rgba(15,23,42,0.12)] backdrop-blur-xl md:hidden">
       <div className="flex items-center justify-between gap-1">
         {navItems.map((item) => {
           const active = location.pathname === item.path;
