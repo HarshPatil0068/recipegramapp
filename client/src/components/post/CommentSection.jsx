@@ -26,14 +26,14 @@ const CommentSection = ({ postId, comments, setComments }) => {
     setError('');
     try {
       const response = await commentService.addComment(postId, newComment);
-      const newCommentData = response.data?.comment || response.comment;
+      const newCommentData = response.comment;
       if (newCommentData) {
         setComments([newCommentData, ...safeComments]);
       }
       setNewComment('');
     } catch (error) {
       console.error('Error adding comment:', error);
-      setError(error.response?.data?.message || 'Failed to add comment');
+      setError(error.message || 'Failed to add comment');
     } finally {
       setLoading(false);
     }
@@ -51,7 +51,7 @@ const CommentSection = ({ postId, comments, setComments }) => {
       setConfirmDeleteId(null);
     } catch (error) {
       console.error('Error deleting comment:', error);
-      setError(error.response?.data?.message || 'Failed to delete comment');
+      setError(error.message || 'Failed to delete comment');
     }
   };
 

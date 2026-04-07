@@ -79,6 +79,24 @@ describe('Post API Endpoints', () => {
         .send(postData)
         .expect(400);
     });
+
+    it('should create a reel post with valid video URL', async () => {
+      const postData = {
+        postType: 'reel',
+        caption: 'Quick pasta trick',
+        video: 'https://example.com/reel.mp4',
+      };
+
+      const response = await request(app)
+        .post('/posts')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send(postData)
+        .expect(201);
+
+      expect(response.body.post).toBeDefined();
+      expect(response.body.post.postType).toBe('reel');
+      expect(response.body.post.video).toBe(postData.video);
+    });
   });
 
   describe('GET /posts', () => {
@@ -119,6 +137,44 @@ describe('Post API Endpoints', () => {
 
       expect(response.body.posts[0].author).toBeDefined();
       expect(response.body.posts[0].author.username).toBe('testuser');
+    });
+  });
+
+  describe('GET /posts/reels', () => {
+    beforeEach(async () => {
+      await Post.create([
+        {
+          caption: 'Recipe image post',
+          image: 'https://example.com/recipe.jpg',
+          author: testUser._id,
+        },
+        {
+          postType: 'reel',
+          caption: 'Short reel 1',
+          video: 'https://example.com/reel1.mp4',
+          author: testUser._id,
+        },
+        {
+          postType: 'reel',
+          caption: 'Short reel 2',
+          video: 'https://example.com/reel2.mp4',
+          author: testUser._id,
+        },
+      ]);
+    });
+
+    it('should return only reel posts', async () => {
+      const response = await request(app)
+        .get('/posts/reels')
+        .set('Authorization', `Bearer ${authToken}`)
+        .expect(200);
+
+      expect(Array.isArray(response.body.posts)).toBe(true);
+      expect(response.body.posts.length).toBe(2);
+      response.body.posts.forEach((post) => {
+        expect(post.postType).toBe('reel');
+        expect(post.video).toBeDefined();
+      });
     });
   });
 

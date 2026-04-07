@@ -8,10 +8,10 @@ const MessageItem = ({ message, isOwn, onReply, isLastOwn }) => {
     <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'} px-1`}>
       <div className={`flex flex-col ${isOwn ? 'items-end' : 'items-start'} max-w-[75%] sm:max-w-md`}>
         <div
-          className={`px-4 py-2.5 rounded-2xl shadow-sm transition-all ${
+          className={`px-4 py-2.5 rounded-2xl transition-all ${
             isOwn
-              ? 'bg-gradient-to-br from-primary-500 to-primary-600 text-white rounded-br-sm'
-              : 'bg-white text-warmGray-900 rounded-bl-sm border border-cream-200'
+              ? 'bg-primary-500 text-white rounded-br-sm'
+              : 'bg-white text-warmGray-900 rounded-bl-sm border border-cream-300'
           } ${isOptimistic ? 'opacity-70' : 'opacity-100'} break-words`}
         >
           {message.parentMessage && (

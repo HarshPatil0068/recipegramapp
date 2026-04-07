@@ -21,7 +21,7 @@ const Search = () => {
     setLoading(true);
     try {
       const response = await userService.searchUsers(searchQuery);
-      setResults(response.data);
+      setResults(response.users || []);
     } catch (error) {
       console.error('Search error:', error);
     } finally {
@@ -40,7 +40,7 @@ const Search = () => {
           results.map(async (user) => {
             try {
               const response = await followService.checkIfFollowing(user._id);
-              return [user._id, response.data?.isFollowing || false];
+              return [user._id, response?.isFollowing || false];
             } catch (error) {
               console.error('Error checking follow status:', error);
               return [user._id, false];
@@ -71,10 +71,10 @@ const Search = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto py-8 px-4">
+    <div className="max-w-2xl mx-auto py-6 px-4">
       <div className="mb-10">
-        <h1 className="text-3xl md:text-4xl font-semibold text-warmGray-900 tracking-tight mb-3">Search Users</h1>
-        <p className="text-warmGray-600 text-lg">Find and connect with other recipe enthusiasts</p>
+        <h1 className="text-2xl md:text-3xl font-semibold text-warmGray-900 tracking-tight mb-2">Search</h1>
+        <p className="text-warmGray-600">Find and connect with recipe creators</p>
       </div>
       
       <div className="mb-10">
@@ -132,7 +132,7 @@ const Search = () => {
               const isFollowing = followStates[user._id] || false;
 
               return (
-                <div key={user._id} className="card p-5 flex items-center gap-4 group flex-wrap sm:flex-nowrap">
+                <div key={user._id} className="card p-5 border border-cream-300 flex items-center gap-4 group flex-wrap sm:flex-nowrap">
                   <Link to={`/profile/${user.username}`}>
                     <div className="avatar w-16 h-16 text-xl transition-transform group-hover:scale-105">
                       {user.profileImage ? (
@@ -163,13 +163,13 @@ const Search = () => {
                           profileImage: user.profileImage
                         }
                       }}
-                      className="px-4 py-2 rounded-lg font-medium border border-cream-200 text-warmGray-700 hover:bg-cream-50 text-center flex-1 sm:flex-none"
+                      className="px-4 py-2 rounded-full font-medium border border-cream-300 text-warmGray-700 hover:bg-cream-50 text-center flex-1 sm:flex-none"
                     >
                       Message
                     </Link>
                     <button
                       onClick={() => handleFollowClick(user._id)}
-                      className={`px-6 py-2 rounded-lg font-medium whitespace-nowrap transition-all active:scale-95 flex-1 sm:flex-none ${
+                      className={`px-6 py-2 rounded-full font-medium whitespace-nowrap transition-all active:scale-95 flex-1 sm:flex-none ${
                         isFollowing
                           ? 'btn-outline'
                           : 'btn-primary'

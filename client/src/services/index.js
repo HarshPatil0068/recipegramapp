@@ -1,4 +1,7 @@
 import api from './api';
+import * as uploadService from './uploadService';
+
+export { uploadService };
 
 // Authentication services
 export const authService = {
@@ -18,23 +21,36 @@ export const authService = {
 // User services
 export const userService = {
   getCurrentUser: async () => {
-    return await api.get('/users/me');
+    const response = await api.get('/users/me');
+    return response?.data || response;
   },
 
   getUserProfile: async (username) => {
-    return await api.get(`/users/${username}`);
+    const response = await api.get(`/users/${username}`);
+    return response?.data || response;
   },
 
   updateProfile: async (profileData) => {
-    return await api.put('/users/profile', profileData);
+    const response = await api.put('/users/profile', profileData);
+    return response?.data || response;
   },
 
   getUserPosts: async (userId, page = 1) => {
-    return await api.get(`/users/${userId}/posts?page=${page}`);
+    const response = await api.get(`/users/${userId}/posts?page=${page}`);
+    return {
+      posts: response?.data || response?.posts || [],
+      totalPages: response?.totalPages,
+      currentPage: response?.currentPage,
+    };
   },
 
   searchUsers: async (query, page = 1) => {
-    return await api.get(`/users/search?q=${query}&page=${page}`);
+    const response = await api.get(`/users/search?q=${query}&page=${page}`);
+    return {
+      users: response?.data || response?.users || [],
+      totalPages: response?.totalPages,
+      currentPage: response?.currentPage,
+    };
   },
 };
 
@@ -52,6 +68,13 @@ export const postService = {
     return await api.post('/posts', postData);
   },
 
+  createReel: async (reelData) => {
+    return await api.post('/posts', {
+      ...reelData,
+      postType: 'reel',
+    });
+  },
+
   updatePost: async (postId, postData) => {
     return await api.put(`/posts/${postId}`, postData);
   },
@@ -62,6 +85,10 @@ export const postService = {
 
   getFeed: async (page = 1, limit = 10) => {
     return await api.get(`/posts/feed?page=${page}&limit=${limit}`);
+  },
+
+  getReels: async (page = 1, limit = 10) => {
+    return await api.get(`/posts/reels?page=${page}&limit=${limit}`);
   },
 
   searchPosts: async (query, page = 1, limit = 10) => {
@@ -187,4 +214,5 @@ export default {
   follow: followService,
   save: saveService,
   notification: notificationService,
+  upload: uploadService,
 };

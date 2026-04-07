@@ -19,9 +19,8 @@ const SavedPosts = () => {
       setLoading(true);
       setError('');
       const response = await saveService.getSavedPosts(page, 12);
-      const data = response.data || response;
-      setPosts(data.posts || []);
-      setTotalPages(data.totalPages || 1);
+      setPosts(response.posts || []);
+      setTotalPages(response.totalPages || 1);
     } catch (error) {
       console.error('Error fetching saved posts:', error);
       setError(error.message || 'Failed to fetch saved posts');
@@ -42,13 +41,13 @@ const SavedPosts = () => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto py-8 px-4">
+    <div className="max-w-6xl mx-auto py-6 px-4">
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2 flex-wrap">
           <svg className="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
           </svg>
-          <h1 className="text-3xl font-semibold text-warmGray-900">Saved Posts</h1>
+          <h1 className="text-2xl md:text-3xl font-semibold text-warmGray-900">Saved Posts</h1>
         </div>
         <p className="text-warmGray-600 sm:ml-11">Your collection of saved recipes ({posts.length} {posts.length === 1 ? 'recipe' : 'recipes'})</p>
       </div>
@@ -89,7 +88,7 @@ const SavedPosts = () => {
               <button
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="px-4 py-2 bg-warmGray-200 rounded-lg text-warmGray-800 hover:bg-warmGray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 bg-warmGray-200 rounded-full text-warmGray-800 hover:bg-warmGray-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Previous
               </button>
@@ -99,7 +98,7 @@ const SavedPosts = () => {
               <button
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-                className="px-4 py-2 bg-warmGray-200 rounded-lg text-warmGray-800 hover:bg-warmGray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-warmGray-200 rounded-full text-warmGray-800 hover:bg-warmGray-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Next
               </button>

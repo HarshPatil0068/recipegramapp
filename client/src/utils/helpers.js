@@ -79,12 +79,12 @@ export const formatNumber = (num) => {
 
 // Handle API errors
 export const handleApiError = (error) => {
-  if (error.response) {
-    return error.response.data.message || 'An error occurred';
-  } else if (error.request) {
+  if (error?.message) {
+    return error.message;
+  } else if (error?.request) {
     return 'Network error. Please check your connection.';
   } else {
-    return error.message || 'An unexpected error occurred';
+    return 'An unexpected error occurred';
   }
 };
 

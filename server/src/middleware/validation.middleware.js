@@ -12,7 +12,15 @@ const isValidUrl = (str) => {
 };
 
 export const validatePost = (req, res, next) => {
-  const { caption, image } = req.body;
+  const { caption, image, video, postType } = req.body;
+  const normalizedType = postType || 'recipe';
+
+  if (!["recipe", "reel"].includes(normalizedType)) {
+    return res.status(400).json({
+      success: false,
+      message: "postType must be either recipe or reel"
+    });
+  }
 
   if (!caption || caption.trim().length === 0) {
     return res.status(400).json({ 
@@ -28,25 +36,41 @@ export const validatePost = (req, res, next) => {
     });
   }
 
-  if (!image || image.trim().length === 0) {
-    return res.status(400).json({ 
-      success: false,
-      message: "Image is required" 
-    });
-  }
+  if (normalizedType === 'reel') {
+    if (!video || video.trim().length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Video is required for reels"
+      });
+    }
 
-  if (!isValidUrl(image)) {
-    return res.status(400).json({ 
-      success: false,
-      message: "Image must be a valid URL" 
-    });
+    if (!isValidUrl(video)) {
+      return res.status(400).json({
+        success: false,
+        message: "Video must be a valid URL"
+      });
+    }
+  } else {
+    if (!image || image.trim().length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Image is required"
+      });
+    }
+
+    if (!isValidUrl(image)) {
+      return res.status(400).json({
+        success: false,
+        message: "Image must be a valid URL"
+      });
+    }
   }
 
   next();
 };
 
 export const validatePostUpdate = (req, res, next) => {
-  const { caption, image } = req.body;
+  const { caption, image, video, postType } = req.body;
 
   if (caption !== undefined) {
     if (caption.trim().length === 0) {
@@ -78,6 +102,29 @@ export const validatePostUpdate = (req, res, next) => {
         message: "Image must be a valid URL" 
       });
     }
+  }
+
+  if (video !== undefined) {
+    if (video.trim().length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Video cannot be empty"
+      });
+    }
+
+    if (!isValidUrl(video)) {
+      return res.status(400).json({
+        success: false,
+        message: "Video must be a valid URL"
+      });
+    }
+  }
+
+  if (postType !== undefined && !["recipe", "reel"].includes(postType)) {
+    return res.status(400).json({
+      success: false,
+      message: "postType must be either recipe or reel"
+    });
   }
 
   next();

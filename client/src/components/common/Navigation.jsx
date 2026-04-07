@@ -16,15 +16,6 @@ const Navigation = () => {
       )
     },
     {
-      path: '/search',
-      label: 'Search',
-      icon: (isActive) => (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={isActive ? 2.5 : 2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-      )
-    },
-    {
       path: '/explore',
       label: 'Explore',
       icon: (isActive) => (
@@ -34,20 +25,29 @@ const Navigation = () => {
       )
     },
     {
-      path: '/messages',
-      label: 'Messages',
+      path: '/reels',
+      label: 'Reels',
       icon: (isActive) => (
         <svg className="w-6 h-6" fill={isActive ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={isActive ? 0 : 2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={isActive ? 0 : 2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
         </svg>
       )
     },
     {
-      path: '/saved',
-      label: 'Saved',
+      path: '/search',
+      label: 'Search',
+      icon: (isActive) => (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={isActive ? 2.5 : 2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      )
+    },
+    {
+      path: '/messages',
+      label: 'DM',
       icon: (isActive) => (
         <svg className="w-6 h-6" fill={isActive ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={isActive ? 0 : 2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={isActive ? 0 : 2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
         </svg>
       )
     },
@@ -63,28 +63,28 @@ const Navigation = () => {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 md:hidden glass border-t border-cream-300/50 backdrop-blur-md">
-      <div className="flex justify-around items-center px-2 py-1 safe-area-inset-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 md:hidden border-t border-cream-300 bg-cream-50/95 backdrop-blur-sm">
+      <div className="flex justify-around items-center px-2 py-2 safe-area-inset-bottom">
         {navItems.map((item) => {
           const isActive = isActivePath(item.path);
           return (
             <Link 
               key={item.path}
               to={item.path} 
-              className={`flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 ${
+              className={`relative flex flex-col items-center py-1.5 px-3 rounded-xl transition-colors ${
                 isActive 
-                  ? 'text-primary-600' 
-                  : 'text-warmGray-600 hover:text-warmGray-800 active:scale-95'
+                  ? 'text-primary-700' 
+                  : 'text-warmGray-500 hover:text-warmGray-800 active:scale-95'
               }`}
             >
-              <div className={`transition-transform duration-200 ${isActive ? 'scale-110' : ''}`}>
+              <div className={`transition-transform duration-200 ${isActive ? 'scale-105' : ''}`}>
                 {item.icon(isActive)}
               </div>
-              <span className={`text-xs mt-1 font-medium ${isActive ? 'text-primary-600' : 'text-warmGray-600'}`}>
+              <span className={`text-[11px] mt-1 font-medium ${isActive ? 'text-primary-700' : 'text-warmGray-600'}`}>
                 {item.label}
               </span>
               {isActive && (
-                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-primary-500 rounded-full" />
+                <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 bg-primary-500 rounded-full" />
               )}
             </Link>
           );

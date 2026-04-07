@@ -29,11 +29,15 @@ const ChatWindow = ({ conversation, onBack }) => {
   const [messageContent, setMessageContent] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [replyTo, setReplyTo] = useState(null);
+  const currentUserId = user?._id?.toString?.() || user?._id || null;
   const typingUser = typing?.[conversation.userId];
   const lastOwnMessageId = currentConversation.messages
     .slice()
     .reverse()
-    .find((message) => message.sender?._id === user?._id)?._id;
+    .find((message) => {
+      const senderId = message?.sender?._id?.toString?.() || message?.sender?._id || message?.sender;
+      return senderId && currentUserId && senderId.toString() === currentUserId.toString();
+    })?._id;
 
   // Fetch conversation on load
   useEffect(() => {
@@ -173,7 +177,7 @@ const ChatWindow = ({ conversation, onBack }) => {
   return (
     <div className="flex flex-col bg-white h-full md:h-auto md:flex-1">
       {/* Header */}
-      <div className="border-b border-cream-200 px-5 py-4 flex items-center justify-between shrink-0 bg-white shadow-sm">
+      <div className="border-b border-cream-300 px-4 sm:px-5 py-3.5 flex items-center justify-between shrink-0 bg-white">
         <div className="flex items-center gap-3">
           <button
             onClick={onBack}
@@ -201,10 +205,10 @@ const ChatWindow = ({ conversation, onBack }) => {
               `https://api.dicebear.com/7.x/avataaars/svg?seed=${conversation.username}`
             }
             alt={conversation.username}
-            className="w-11 h-11 rounded-full object-cover border-2 border-cream-200"
+            className="w-10 h-10 rounded-full object-cover border border-cream-300"
           />
           <div>
-            <h2 className="font-bold text-warmGray-900">{conversation.username}</h2>
+            <h2 className="font-semibold text-warmGray-900 leading-tight">{conversation.username}</h2>
             <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
               <p className="text-xs text-warmGray-500">Active now</p>
@@ -249,7 +253,7 @@ const ChatWindow = ({ conversation, onBack }) => {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-3 bg-gradient-to-b from-cream-50 to-white">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3 bg-cream-50">
         {loading ? (
           <div className="h-full flex items-center justify-center">
             <Loading />
@@ -272,7 +276,10 @@ const ChatWindow = ({ conversation, onBack }) => {
               <MessageItem
                 key={message._id}
                 message={message}
-                isOwn={message.sender._id === user._id}
+                isOwn={(() => {
+                  const senderId = message?.sender?._id?.toString?.() || message?.sender?._id || message?.sender;
+                  return Boolean(senderId && currentUserId && senderId.toString() === currentUserId.toString());
+                })()}
                 onReply={setReplyTo}
                 isLastOwn={message._id === lastOwnMessageId}
               />
@@ -293,7 +300,7 @@ const ChatWindow = ({ conversation, onBack }) => {
       </div>
 
       {/* Input Area */}
-      <form onSubmit={handleSendMessage} className="border-t border-cream-200 p-4 bg-white shrink-0 shadow-lg">
+      <form onSubmit={handleSendMessage} className="border-t border-cream-300 p-3 sm:p-4 bg-white shrink-0">
         {replyTo && (
           <div className="mb-3 px-4 py-3 rounded-xl bg-primary-50 border border-primary-200 flex items-start justify-between gap-3">
             <div className="flex-1">
@@ -312,7 +319,7 @@ const ChatWindow = ({ conversation, onBack }) => {
             </button>
           </div>
         )}
-        <div className="flex gap-3 items-end">
+        <div className="flex gap-2 items-end">
           <button
             type="button"
             className="p-2.5 hover:bg-cream-100 rounded-full transition-all active:scale-95 shrink-0 mb-0.5"
@@ -350,14 +357,14 @@ const ChatWindow = ({ conversation, onBack }) => {
               }}
               onBlur={() => setIsTyping(false)}
               placeholder="Type a message..."
-              className="w-full rounded-full border border-cream-300 bg-cream-50 pl-4 pr-4 py-3 text-sm text-warmGray-900 placeholder:text-warmGray-400 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-transparent transition-all"
+              className="w-full rounded-full border border-cream-300 bg-cream-50 pl-4 pr-4 py-2.5 text-sm text-warmGray-900 placeholder:text-warmGray-400 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-transparent transition-all"
             />
           </div>
 
           <button
             type="submit"
             disabled={!messageContent.trim()}
-            className="p-3 rounded-full bg-primary-500 text-white font-medium hover:bg-primary-600 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary-500 transition-all shrink-0 shadow-md hover:shadow-lg"
+            className="p-2.5 rounded-full bg-primary-500 text-white font-medium hover:bg-primary-600 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary-500 transition-all shrink-0"
             title="Send message"
           >
             <svg

@@ -15,6 +15,7 @@ import Search from './pages/Search';
 import Explore from './pages/Explore';
 import Messages from './pages/Messages';
 import SavedPosts from './pages/SavedPosts';
+import Reels from './pages/Reels';
 import './index.css';
 
 function App() {
@@ -66,6 +67,14 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <Explore />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/reels"
+                  element={
+                    <ProtectedRoute>
+                      <Reels />
                     </ProtectedRoute>
                   }
                 />

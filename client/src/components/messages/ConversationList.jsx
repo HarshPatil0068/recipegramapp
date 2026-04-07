@@ -6,6 +6,7 @@ const ConversationList = ({
   conversations = [],
   loading = false,
   error = null,
+  selectedConversationId = null,
   onSelectConversation
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -41,14 +42,14 @@ const ConversationList = ({
   return (
     <div className="flex-1 overflow-y-auto flex flex-col">
       {/* Search Input */}
-      <div className="p-4 border-b border-cream-200 sticky top-0 bg-white z-10 shadow-sm">
+      <div className="p-4 border-b border-cream-300 sticky top-0 bg-white z-10">
         <div className="relative">
           <input
             type="text"
             placeholder="Search conversations..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-lg border border-cream-300 bg-cream-50 pl-10 pr-4 py-2.5 text-sm text-warmGray-900 placeholder:text-warmGray-400 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-transparent transition-all"
+            className="w-full rounded-full border border-cream-300 bg-cream-50 pl-10 pr-4 py-2.5 text-sm text-warmGray-900 placeholder:text-warmGray-400 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-transparent transition-all"
           />
           <svg
             className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-warmGray-400"
@@ -89,12 +90,16 @@ const ConversationList = ({
           </div>
         </div>
       ) : (
-        <div className="bg-cream-50">
+        <div className="bg-white">
           {filteredConversations.map((conversation) => (
             <button
               key={conversation.userId}
               onClick={() => onSelectConversation(conversation)}
-              className="w-full px-4 py-4 border-b border-cream-200 hover:bg-cream-100 active:bg-cream-200 transition-colors duration-150 text-left group"
+              className={`w-full px-4 py-3 border-b border-cream-200 transition-colors duration-150 text-left group ${
+                selectedConversationId === conversation.userId
+                  ? 'bg-primary-50'
+                  : 'hover:bg-cream-100 active:bg-cream-200'
+              }`}
             >
               <div className="flex items-center gap-3">
                 {/* User Avatar */}

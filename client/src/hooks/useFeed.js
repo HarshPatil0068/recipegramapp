@@ -24,13 +24,13 @@ export const useFeed = () => {
       const response = await postService.getFeed(page);
 
       // Backend returns { page, limit, total, totalPages, posts }
-      const postsArray = response.data?.posts || response.posts || [];
-      const hasMore = response.data?.page < response.data?.totalPages || false;
+      const postsArray = response.posts || [];
+      const hasMore = (response.page || page) < (response.totalPages || page);
 
       dispatch(fetchFeedSuccess({
         posts: postsArray,
         hasMore: hasMore,
-        page: response.data?.page || page,
+        page: response.page || page,
         reset,
       }));
 

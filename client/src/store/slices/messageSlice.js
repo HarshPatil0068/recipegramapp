@@ -17,7 +17,7 @@ export const sendMessage = createAsyncThunk(
       });
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Failed to send message");
+      return rejectWithValue(error.message || "Failed to send message");
     }
   }
 );
@@ -29,7 +29,7 @@ export const fetchConversations = createAsyncThunk(
       const response = await api.get("/messages");
       return response.conversations;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Failed to fetch conversations");
+      return rejectWithValue(error.message || "Failed to fetch conversations");
     }
   }
 );
@@ -46,7 +46,7 @@ export const fetchConversation = createAsyncThunk(
         total: response.total
       };
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Failed to fetch conversation");
+      return rejectWithValue(error.message || "Failed to fetch conversation");
     }
   }
 );
@@ -58,7 +58,7 @@ export const markMessageAsRead = createAsyncThunk(
       const response = await api.put(`/messages/${messageId}/read`);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Failed to mark message as read");
+      return rejectWithValue(error.message || "Failed to mark message as read");
     }
   }
 );
@@ -70,7 +70,7 @@ export const deleteMessage = createAsyncThunk(
       await api.delete(`/messages/${messageId}`);
       return messageId;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Failed to delete message");
+      return rejectWithValue(error.message || "Failed to delete message");
     }
   }
 );
@@ -82,7 +82,7 @@ export const fetchUnreadCount = createAsyncThunk(
       const response = await api.get("/messages/unread/count");
       return response.unreadCount;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Failed to fetch unread count");
+      return rejectWithValue(error.message || "Failed to fetch unread count");
     }
   }
 );

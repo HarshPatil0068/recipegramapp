@@ -50,14 +50,20 @@ const Messages = () => {
   };
 
   return (
-    <div className="h-[calc(100vh-4rem)] flex flex-col md:flex-row bg-cream-50">
+    <div className="h-[calc(100vh-4rem)] bg-cream-50 p-0 md:p-4">
+      <div className="h-full max-w-6xl mx-auto card border border-cream-300 bg-white overflow-hidden flex flex-col md:flex-row">
       {/* Conversations List - Hidden on mobile when chat is open */}
-      <div className={`${selectedConversation ? 'hidden md:flex' : 'flex'} w-full md:w-96 border-r border-cream-300 bg-white shadow-sm flex-col`}>
-        <div className="p-5 border-b border-cream-200 bg-white">
-          <div className="flex items-center justify-between mb-3">
-            <h1 className="text-2xl font-bold text-warmGray-900">Messages</h1>
+      <div className={`${selectedConversation ? 'hidden md:flex' : 'flex'} w-full md:w-[360px] border-r border-cream-300 bg-white flex-col`}>
+        <div className="px-5 py-4 border-b border-cream-300 bg-white">
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-semibold text-warmGray-900">Direct</h1>
+            <button className="p-2 rounded-full hover:bg-cream-100 text-warmGray-700">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+            </button>
           </div>
-          <p className="text-sm text-warmGray-600">
+          <p className="text-xs text-warmGray-500 mt-1">
             {conversations.length} {conversations.length === 1 ? 'conversation' : 'conversations'}
           </p>
         </div>
@@ -65,6 +71,7 @@ const Messages = () => {
           conversations={conversations}
           loading={loading}
           error={error}
+          selectedConversationId={selectedConversation?.userId || currentConversation?.userId}
           onSelectConversation={handleSelectConversation}
         />
       </div>
@@ -76,11 +83,11 @@ const Messages = () => {
           onBack={handleBackToList}
         />
       ) : (
-        <div className="hidden md:flex flex-1 items-center justify-center bg-gradient-to-br from-cream-50 to-primary-50">
+        <div className="hidden md:flex flex-1 items-center justify-center bg-cream-50">
           <div className="text-center px-6">
-            <div className="w-32 h-32 mx-auto mb-6 bg-primary-100 rounded-full flex items-center justify-center">
+            <div className="w-24 h-24 mx-auto mb-5 bg-primary-100 rounded-full flex items-center justify-center">
               <svg
-                className="w-16 h-16 text-primary-500"
+                className="w-12 h-12 text-primary-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -93,15 +100,16 @@ const Messages = () => {
                 />
               </svg>
             </div>
-            <h2 className="text-3xl font-bold text-warmGray-800 mb-3">
+            <h2 className="text-2xl font-semibold text-warmGray-800 mb-2">
               Your Messages
             </h2>
-            <p className="text-warmGray-600 text-lg max-w-md mx-auto">
-              Select a conversation from the list to start chatting with your friends and share recipes!
+            <p className="text-warmGray-600 max-w-md mx-auto">
+              Send private updates, share recipes, and keep conversations in one place.
             </p>
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 };

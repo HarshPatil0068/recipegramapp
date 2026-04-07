@@ -5,8 +5,8 @@
    =================================== */
 
 :root {
-  --font-body: "Avenir Next", "Segoe UI", "Noto Sans", system-ui, -apple-system, sans-serif;
-  --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+  --font-body: "Manrope", "Avenir Next", "Segoe UI", "Noto Sans", system-ui, -apple-system, sans-serif;
+  --font-display: "Cormorant Garamond", "Iowan Old Style", Georgia, serif;
 
   /* Warm neutral backgrounds - earthy creams and beiges */
   --color-cream-50: 253 252 251;   /* Lightest cream - main background */
@@ -240,16 +240,16 @@
   /* Card component */
   .card {
     background-color: rgb(var(--color-cream-100));
-    border-radius: 0.75rem;
-    box-shadow: 0 4px 6px -1px rgba(74, 69, 67, 0.08), 0 2px 4px -1px rgba(74, 69, 67, 0.04);
-    border: 1px solid rgba(var(--color-cream-300), 0.5);
+    border-radius: 0.95rem;
+    box-shadow: 0 1px 2px rgba(42, 39, 37, 0.08);
+    border: 1px solid rgba(var(--color-cream-300), 0.9);
     transition-property: box-shadow;
     transition-timing-function: ease-in-out;
     transition-duration: 300ms;
   }
   
   .card:hover {
-    box-shadow: 0 6px 12px -2px rgba(74, 69, 67, 0.10), 0 3px 6px -2px rgba(74, 69, 67, 0.05);
+    box-shadow: 0 3px 10px rgba(42, 39, 37, 0.09);
   }
   
   /* Button variants */
@@ -257,7 +257,7 @@
     padding: 0.75rem 1.5rem;
     background-color: rgb(var(--color-primary-500));
     color: white;
-    border-radius: 0.5rem;
+    border-radius: 9999px;
     font-weight: 500;
     box-shadow: 0 2px 4px -1px rgba(74, 69, 67, 0.06), 0 1px 2px -1px rgba(74, 69, 67, 0.04);
     transition-property: all;
