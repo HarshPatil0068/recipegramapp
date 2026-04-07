@@ -46,6 +46,9 @@ app.use("/api/notifications", notificationRoutes);
 import messageRoutes from "./routes/message.routes.js";
 app.use("/messages", messageRoutes);
 
+import aiRoutes from "./routes/ai.routes.js";
+app.use("/ai", aiRoutes);
+
 app.get('/', (req, res)=>{
     res.json({ 
         success: true, 

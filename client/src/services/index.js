@@ -205,6 +205,18 @@ export const notificationService = {
   },
 };
 
+// AI recipe services
+export const aiService = {
+  suggestRecipes: async ({ ingredients, cuisine = '', diet = '', maxSuggestions = 5 }) => {
+    return await api.post('/ai/recipes/suggest', {
+      ingredients,
+      cuisine,
+      diet,
+      maxSuggestions,
+    });
+  },
+};
+
 export default {
   auth: authService,
   user: userService,
@@ -214,5 +226,6 @@ export default {
   follow: followService,
   save: saveService,
   notification: notificationService,
+  ai: aiService,
   upload: uploadService,
 };

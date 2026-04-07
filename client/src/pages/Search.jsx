@@ -8,29 +8,28 @@ const Search = () => {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [followStates, setFollowStates] = useState({});
-  
   const debouncedQuery = useDebounce(query, 500);
   const { toggleFollow } = useFollow();
 
-  const handleSearch = async (searchQuery) => {
-    if (!searchQuery.trim()) {
-      setResults([]);
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const response = await userService.searchUsers(searchQuery);
-      setResults(response.users || []);
-    } catch (error) {
-      console.error('Search error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    handleSearch(debouncedQuery);
+    const runSearch = async () => {
+      if (!debouncedQuery.trim()) {
+        setResults([]);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const response = await userService.searchUsers(debouncedQuery);
+        setResults(response.users || []);
+      } catch (error) {
+        console.error('Search error:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    runSearch();
   }, [debouncedQuery]);
 
   useEffect(() => {
@@ -53,135 +52,100 @@ const Search = () => {
       }
     };
 
-    if (results.length > 0) {
-      checkFollowStatuses();
-    }
+    if (results.length > 0) checkFollowStatuses();
   }, [results]);
 
-  const handleFollowClick = async (userId) => {
-    const isCurrentlyFollowing = followStates[userId] || false;
-    const result = await toggleFollow(userId, isCurrentlyFollowing);
-
-    if (result.success) {
-      setFollowStates(prev => ({
-        ...prev,
-        [userId]: result.isFollowing
-      }));
-    }
-  };
-
   return (
-    <div className="max-w-2xl mx-auto py-6 px-4">
-      <div className="mb-10">
-        <h1 className="text-2xl md:text-3xl font-semibold text-warmGray-900 tracking-tight mb-2">Search</h1>
-        <p className="text-warmGray-600">Find and connect with recipe creators</p>
-      </div>
-      
-      <div className="mb-10">
-        <div className="relative">
+    <div className="page-shell max-w-3xl">
+      <div className="ig-card p-5">
+        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[rgb(var(--color-text-faint))]">Search</p>
+        <h1 className="mt-1 text-3xl font-extrabold text-black">Find your food people</h1>
+        <div className="relative mt-5">
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search by username or name..."
+            placeholder="Search by username..."
             className="input pl-12"
           />
-          <svg 
-            className="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-warmGray-400" 
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
-          >
+          <svg className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[rgb(var(--color-text-faint))]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </div>
       </div>
 
       {loading && (
-        <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-10 w-10 border-4 border-warmGray-200 border-t-primary-500"></div>
-          <div className="text-lg mt-4 text-warmGray-600 font-medium">Searching...</div>
+        <div className="py-12 text-center">
+          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-[rgb(var(--color-border))] border-t-[rgb(var(--color-primary))]" />
+          <p className="mt-4 text-sm font-medium text-[rgb(var(--color-text-soft))]">Searching creators...</p>
         </div>
       )}
 
       {!loading && !query && (
-        <div className="card text-center py-16 px-6">
-          <svg className="w-24 h-24 mx-auto text-warmGray-300 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-          </svg>
-          <h2 className="text-2xl font-semibold text-warmGray-900 mb-3">Find Recipe Creators</h2>
-          <p className="text-warmGray-600 text-lg">Start typing to search for users to follow</p>
+        <div className="ig-card mt-5 p-10 text-center">
+          <h2 className="text-2xl font-bold text-black">Start typing to search</h2>
+          <p className="mt-2 text-sm text-[rgb(var(--color-text-soft))]">Find creators, open their profile, follow them, or jump straight into messages.</p>
         </div>
       )}
 
       {!loading && results.length === 0 && query && (
-        <div className="card text-center py-16 px-6">
-          <svg className="w-24 h-24 mx-auto text-warmGray-300 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <h2 className="text-2xl font-semibold text-warmGray-900 mb-3">No Users Found</h2>
-          <p className="text-warmGray-600 text-lg">Try searching with a different username</p>
+        <div className="ig-card mt-5 p-10 text-center">
+          <h2 className="text-2xl font-bold text-black">No users found</h2>
+          <p className="mt-2 text-sm text-[rgb(var(--color-text-soft))]">Try another spelling or search for a different username.</p>
         </div>
       )}
 
       {!loading && results.length > 0 && (
-        <div>
-          <p className="text-sm text-warmGray-600 mb-6 font-medium">{results.length} user{results.length !== 1 ? 's' : ''} found</p>
-          <div className="space-y-4">
-            {results.map((user) => {
-              const isFollowing = followStates[user._id] || false;
-
-              return (
-                <div key={user._id} className="card p-5 border border-cream-300 flex items-center gap-4 group flex-wrap sm:flex-nowrap">
-                  <Link to={`/profile/${user.username}`}>
-                    <div className="avatar w-16 h-16 text-xl transition-transform group-hover:scale-105">
+        <div className="mt-5 space-y-4">
+          {results.map((user) => {
+            const isFollowing = followStates[user._id] || false;
+            return (
+              <div key={user._id} className="ig-card flex flex-wrap items-center gap-4 p-4 sm:flex-nowrap">
+                <Link to={`/profile/${user.username}`} className="story-ring shrink-0">
+                  <div className="story-ring-inner">
+                    <div className="avatar h-16 w-16 text-xl">
                       {user.profileImage ? (
-                        <img src={user.profileImage} alt={user.username} className="w-full h-full rounded-full object-cover" />
+                        <img src={user.profileImage} alt={user.username} className="h-full w-full object-cover" />
                       ) : (
-                        user.username.charAt(0).toUpperCase()
+                        user.username.charAt(0)
                       )}
                     </div>
+                  </div>
+                </Link>
+
+                <div className="min-w-0 flex-1">
+                  <Link to={`/profile/${user.username}`} className="block truncate text-base font-bold text-black">
+                    {user.username}
                   </Link>
-                  <div className="flex-1 min-w-0">
-                    <Link to={`/profile/${user.username}`}>
-                      <h3 className="font-semibold text-lg text-warmGray-900 hover:text-primary-600 transition-colors truncate">{user.username}</h3>
-                    </Link>
-                    {user.bio && <p className="text-sm text-warmGray-600 truncate mt-0.5">{user.bio}</p>}
-                    <p className="text-xs text-warmGray-500 mt-2 flex items-center gap-3">
-                      <span>{user.followersCount || 0} followers</span>
-                      <span>·</span>
-                      <span>{user.followingCount || 0} following</span>
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2 w-full sm:w-auto">
-                    <Link
-                      to="/messages"
-                      state={{
-                        openConversation: {
-                          userId: user._id,
-                          username: user.username,
-                          profileImage: user.profileImage
-                        }
-                      }}
-                      className="px-4 py-2 rounded-full font-medium border border-cream-300 text-warmGray-700 hover:bg-cream-50 text-center flex-1 sm:flex-none"
-                    >
-                      Message
-                    </Link>
-                    <button
-                      onClick={() => handleFollowClick(user._id)}
-                      className={`px-6 py-2 rounded-full font-medium whitespace-nowrap transition-all active:scale-95 flex-1 sm:flex-none ${
-                        isFollowing
-                          ? 'btn-outline'
-                          : 'btn-primary'
-                      }`}
-                    >
-                      {isFollowing ? 'Following' : 'Follow'}
-                    </button>
-                  </div>
+                  <p className="mt-1 truncate text-sm text-[rgb(var(--color-text-soft))]">{user.bio || 'Food creator'}</p>
+                  <p className="mt-2 text-xs font-medium text-[rgb(var(--color-text-faint))]">
+                    {user.followersCount || 0} followers · {user.followingCount || 0} following
+                  </p>
                 </div>
-              );
-            })}
-          </div>
+
+                <div className="flex w-full gap-2 sm:w-auto">
+                  <Link
+                    to="/messages"
+                    state={{ openConversation: { userId: user._id, username: user.username, profileImage: user.profileImage } }}
+                    className="btn-outline flex-1 rounded-full sm:flex-none"
+                  >
+                    Message
+                  </Link>
+                  <button
+                    onClick={async () => {
+                      const result = await toggleFollow(user._id, isFollowing);
+                      if (result.success) {
+                        setFollowStates((prev) => ({ ...prev, [user._id]: result.isFollowing }));
+                      }
+                    }}
+                    className={`${isFollowing ? 'btn-outline' : 'btn-primary'} flex-1 rounded-full sm:flex-none`}
+                  >
+                    {isFollowing ? 'Following' : 'Follow'}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

@@ -7,6 +7,19 @@ import logger from "./logger.js";
 // Store active connections
 const activeUsers = new Map(); // userId -> socketId
 
+const parseBoolean = (value, defaultValue) => {
+  if (value === undefined) return defaultValue;
+  return value.toLowerCase() === "true";
+};
+
+const parseOrigins = (value, fallback = []) => {
+  if (!value) return fallback;
+  return value
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+};
+
 /**
  * Initialize Socket.IO server
  * Throws if JWT_SECRET is not set — the server must not start without it.
@@ -17,10 +30,14 @@ export const initializeSocket = (httpServer) => {
     throw new Error("JWT_SECRET environment variable is required but not set");
   }
 
+  const socketCorsOrigins = parseOrigins(process.env.SOCKET_CORS_ORIGINS, [
+    process.env.CLIENT_URL || "http://localhost:5173"
+  ]);
+
   const io = new Server(httpServer, {
     cors: {
-      origin: process.env.CLIENT_URL || "http://localhost:5173",
-      credentials: true
+      origin: socketCorsOrigins,
+      credentials: parseBoolean(process.env.SOCKET_CORS_CREDENTIALS, true)
     }
   });
 
