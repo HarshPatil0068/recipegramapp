@@ -1,5 +1,6 @@
 import User from '../models/User.model.js';
 import Post from '../models/Post.model.js';
+import { uploadToCloudinary } from '../util/cloudinary.js';
 
 // Get current user (me)
 export const getCurrentUser = async (req, res, next) => {
@@ -59,7 +60,21 @@ export const updateUserProfile = async (req, res, next) => {
 
     const updateData = {};
     if (bio !== undefined) updateData.bio = bio;
-    if (profileImage !== undefined) updateData.profileImage = profileImage;
+
+    if (req.file) {
+      const uploadResult = await uploadToCloudinary(
+        req.file.buffer,
+        'recipegram/profiles',
+        'image',
+        {
+          original_filename: req.file.originalname,
+          tags: [userId.toString(), 'profile']
+        }
+      );
+      updateData.profileImage = uploadResult.secure_url;
+    } else if (profileImage !== undefined) {
+      updateData.profileImage = profileImage;
+    }
 
     const user = await User.findByIdAndUpdate(
       userId,

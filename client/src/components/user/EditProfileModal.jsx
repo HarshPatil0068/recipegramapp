@@ -1,13 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { userService } from '../../services';
+import FileUploadBox from '../common/FileUploadBox';
+import { userService, uploadService } from '../../services';
 import { fetchUserSuccess } from '../../store/slices/userSlice';
+import { updateUser } from '../../store/slices/authSlice';
 import { useToast } from '../../context/ToastContext';
 
 const EditProfileModal = ({ isOpen, onClose, currentProfile }) => {
   const [bio, setBio] = useState('');
   const [profileImage, setProfileImage] = useState('');
-  const [imageError, setImageError] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const { showToast } = useToast();
@@ -16,22 +20,47 @@ const EditProfileModal = ({ isOpen, onClose, currentProfile }) => {
     if (currentProfile) {
       setBio(currentProfile.bio || '');
       setProfileImage(currentProfile.profileImage || '');
-      setImageError(false);
+      setSelectedFile(null);
+      setUploadProgress(0);
     }
   }, [currentProfile]);
+
+  const handleFileSelect = (file) => {
+    setSelectedFile(file);
+    setUploadProgress(0);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const response = await userService.updateProfile({ bio, profileImage });
-      dispatch(fetchUserSuccess(response.data));
+      let uploadedImageUrl = profileImage;
+
+      if (selectedFile) {
+        setIsUploadingImage(true);
+        const uploadResult = await uploadService.uploadFile(selectedFile, 'profile', setUploadProgress);
+
+        if (!uploadResult.success) {
+          throw new Error(uploadResult.error || 'Failed to upload profile image');
+        }
+
+        uploadedImageUrl = uploadResult.url;
+      }
+
+      const formData = new FormData();
+      formData.append('bio', bio);
+      formData.append('profileImage', uploadedImageUrl || '');
+
+      const response = await userService.updateProfile(formData);
+      dispatch(fetchUserSuccess(response));
+      dispatch(updateUser(response));
       showToast('Profile updated successfully!', 'success');
       onClose();
     } catch (error) {
       showToast(error.message || 'Failed to update profile', 'error');
     } finally {
+      setIsUploadingImage(false);
       setLoading(false);
     }
   };
@@ -71,26 +100,38 @@ const EditProfileModal = ({ isOpen, onClose, currentProfile }) => {
 
             <div>
               <label className="block text-sm font-medium mb-2">
-                Profile Image URL
+                Profile Image
               </label>
+              <FileUploadBox
+                onFileSelect={handleFileSelect}
+                accept="image/*"
+                label="Upload profile photo"
+                maxSize={10 * 1024 * 1024}
+                isLoading={isUploadingImage}
+                preview={profileImage ? { url: profileImage, type: 'image/jpeg' } : null}
+              />
+              {isUploadingImage && (
+                <div className="mt-3 space-y-1">
+                  <div className="flex justify-between text-xs text-warmGray-600">
+                    <span>Uploading image</span>
+                    <span>{uploadProgress}%</span>
+                  </div>
+                  <div className="h-2 bg-warmGray-200 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-primary-500 transition-all duration-300"
+                      style={{ width: `${uploadProgress}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+              <p className="text-xs text-warmGray-500 mt-3 mb-2">Or paste an image URL:</p>
               <input
                 type="url"
                 value={profileImage}
-                onChange={(e) => { setProfileImage(e.target.value); setImageError(false); }}
+                onChange={(e) => setProfileImage(e.target.value)}
                 className="input"
                 placeholder="https://example.com/image.jpg"
               />
-              {profileImage && !imageError && (
-                <div className="mt-4">
-                  <p className="text-sm font-medium mb-2">Preview:</p>
-                  <img
-                    src={profileImage}
-                    alt="Profile preview"
-                    className="w-24 h-24 rounded-full object-cover"
-                    onError={() => setImageError(true)}
-                  />
-                </div>
-              )}
             </div>
 
             <div className="flex gap-4">

@@ -10,13 +10,15 @@ import Like from "../models/Like.model.js";
  */
 export const createPost = async (req, res) => {
   try {
-    const { caption, ingredients, steps, image } = req.body;
+    const { caption, ingredients, steps, image, video, postType = "recipe" } = req.body;
 
     const post = await Post.create({
+      postType,
       caption,
-      ingredients,
-      steps,
-      image,
+      ingredients: postType === "reel" ? [] : ingredients,
+      steps: postType === "reel" ? [] : steps,
+      image: postType === "reel" ? undefined : image,
+      video: postType === "reel" ? video : undefined,
       author: req.user._id
     });
 
@@ -128,6 +130,40 @@ export const getFeed = async (req, res) => {
 };
 
 /**
+ * Get reels feed with pagination
+ * @route GET /posts/reels?page=1&limit=10
+ * @access Private
+ */
+export const getReels = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const query = { postType: "reel" };
+    const total = await Post.countDocuments(query);
+    const totalPages = Math.ceil(total / limit);
+
+    const posts = await Post.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate("author", "username profileImage");
+
+    res.json({
+      page,
+      limit,
+      total,
+      totalPages,
+      posts
+    });
+  } catch (err) {
+    console.error("Get reels error:", err);
+    res.status(500).json({ message: "Failed to fetch reels" });
+  }
+};
+
+/**
  * Update a post (author only)
  * @route PUT /posts/:id
  * @access Private
@@ -135,7 +171,7 @@ export const getFeed = async (req, res) => {
 export const updatePost = async (req, res) => {
   try {
     const { id } = req.params;
-    const { caption, ingredients, steps, image } = req.body;
+    const { caption, ingredients, steps, image, video, postType } = req.body;
 
     const post = await Post.findById(id);
     if (!post) {
@@ -152,6 +188,16 @@ export const updatePost = async (req, res) => {
     if (ingredients !== undefined) post.ingredients = ingredients;
     if (steps !== undefined) post.steps = steps;
     if (image !== undefined) post.image = image;
+    if (video !== undefined) post.video = video;
+    if (postType !== undefined) post.postType = postType;
+
+    if (post.postType === "reel") {
+      post.image = undefined;
+      post.ingredients = [];
+      post.steps = [];
+    } else {
+      post.video = undefined;
+    }
 
     await post.save();
     await post.populate("author", "username profileImage");
@@ -243,7 +289,7 @@ export const searchPosts = async (req, res) => {
 };
 
 /**
- * Get trending posts (most liked in last 7 days)
+ * Get trending posts (most liked in last 7 days, fallback to recent posts)
  * @route GET /posts/trending?limit=10
  * @access Private
  */
@@ -255,12 +301,25 @@ export const getTrendingPosts = async (req, res) => {
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-    const posts = await Post.find({ 
+    let posts = await Post.find({ 
       createdAt: { $gte: sevenDaysAgo } 
     })
       .sort({ likesCount: -1, createdAt: -1 })
       .limit(limit)
       .populate("author", "username profileImage");
+
+    // If not enough trending posts, fill with recent posts
+    if (posts.length < limit) {
+      const recentPosts = await Post.find()
+        .sort({ createdAt: -1 })
+        .limit(limit)
+        .populate("author", "username profileImage");
+      
+      // Merge and deduplicate
+      const postIds = new Set(posts.map(p => p._id.toString()));
+      const additionalPosts = recentPosts.filter(p => !postIds.has(p._id.toString()));
+      posts = [...posts, ...additionalPosts].slice(0, limit);
+    }
 
     res.json({ posts });
   } catch (err) {

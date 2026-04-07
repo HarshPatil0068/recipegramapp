@@ -20,8 +20,7 @@ const Explore = () => {
       setLoading(true);
       setError('');
       const response = await postService.getTrendingPosts(20);
-      const data = response.data || response;
-      setTrendingPosts(data.posts || []);
+      setTrendingPosts(response.posts || []);
     } catch (error) {
       console.error('Error fetching trending posts:', error);
       setError(error.message || 'Failed to fetch trending posts');
@@ -38,9 +37,9 @@ const Explore = () => {
       setSearching(true);
       setError('');
       const response = await postService.searchPosts(searchQuery, 1, 20);
-      const data = response.data || response;
-      setSearchResults(data.posts || []);
-    } catch (error) {
+      const [searching, setSearching] = useState(false);
+      const [error, setError] = useState('');
+      const [activeFilter, setActiveFilter] = useState('all');
       console.error('Error searching posts:', error);
       setError(error.message || 'Failed to search posts');
     } finally {
@@ -58,10 +57,10 @@ const Explore = () => {
   const isSearchActive = searchQuery.trim().length > 0;
 
   return (
-    <div className="max-w-6xl mx-auto py-8 px-4">
+    <div className="max-w-6xl mx-auto py-6 px-4">
       <div className="mb-10">
-        <h1 className="text-3xl md:text-4xl font-semibold text-warmGray-900 tracking-tight mb-3">Explore Recipes</h1>
-        <p className="text-warmGray-600 text-lg">Discover trending recipes and search for new ideas</p>
+        <h1 className="text-2xl md:text-3xl font-semibold text-warmGray-900 tracking-tight mb-2">Explore</h1>
+        <p className="text-warmGray-600">Discover trending recipes and new ideas</p>
         
         {/* Search Bar */}
         <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-2 mt-6">
@@ -69,7 +68,6 @@ const Explore = () => {
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search recipes by name or ingredients..."
               className="input pl-12"
             />
@@ -86,7 +84,7 @@ const Explore = () => {
             <button
               type="button"
               onClick={clearSearch}
-              className="btn-outline w-full sm:w-auto"
+              className="btn-outline rounded-full w-full sm:w-auto"
             >
               Clear
             </button>
@@ -94,7 +92,7 @@ const Explore = () => {
             <button
               type="submit"
               disabled={searching || !searchQuery.trim()}
-              className="btn-primary w-full sm:w-auto"
+              className="btn-primary rounded-full w-full sm:w-auto"
             >
               {searching ? 'Searching...' : 'Search'}
             </button>
@@ -115,7 +113,7 @@ const Explore = () => {
 
       {/* Section Title */}
       <div className="mb-8">
-        <h2 className="text-2xl font-semibold text-warmGray-900">
+        <h2 className="text-xl font-semibold text-warmGray-900">
           {isSearchActive ? `Search Results${searchResults.length > 0 ? ` (${searchResults.length})` : ''}` : 'Trending Recipes'}
         </h2>
         {!isSearchActive && (

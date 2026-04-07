@@ -34,17 +34,17 @@ const PostDetail = () => {
           commentService.getComments(postId),
           likeService.checkIfLiked(postId),
         ]);
-        const postData = postResponse.data || postResponse;
+        const postData = postResponse;
         setPost(postData);
-        setComments(commentsResponse.data?.comments || commentsResponse.comments || []);
-        setIsLiked(likeResponse.data?.isLiked || likeResponse.isLiked || false);
+        setComments(commentsResponse.comments || []);
+        setIsLiked(likeResponse.isLiked || false);
         setLikesCount(postData.likesCount || 0);
         setEditCaption(postData.caption || '');
         setEditIngredients(postData.ingredients?.join('\n') || '');
         setEditSteps(postData.steps?.join('\n') || '');
       } catch (error) {
         console.error('Error fetching post:', error);
-        setError(error.response?.data?.message || 'Failed to load post');
+        setError(error.message || 'Failed to load post');
       } finally {
         setLoading(false);
       }
@@ -64,7 +64,7 @@ const PostDetail = () => {
       setIsLiked(!isLiked);
     } catch (error) {
       console.error('Error toggling like:', error);
-      setError(error.response?.data?.message || 'Failed to toggle like');
+      setError(error.message || 'Failed to toggle like');
       // Clear error after 3 seconds
       setTimeout(() => setError(null), 3000);
     }
@@ -100,7 +100,7 @@ const PostDetail = () => {
         steps,
       });
       
-      const updatedPost = response.data?.post || response.post;
+      const updatedPost = response.post || response;
       setPost(updatedPost);
       setIsEditing(false);
       showToast('Post updated successfully!', 'success');
@@ -165,13 +165,23 @@ const PostDetail = () => {
       )}
       <div className="card overflow-hidden">
         <div className="relative">
-          <img 
-            src={post.image} 
-            alt={post.caption} 
-            className="w-full h-96 object-cover"
-          />
+          {post.postType === 'reel' && post.video ? (
+            <video
+              src={post.video}
+              className="w-full h-96 object-cover bg-black"
+              controls
+              loop
+              playsInline
+            />
+          ) : (
+            <img
+              src={post.image}
+              alt={post.caption}
+              className="w-full h-96 object-cover"
+            />
+          )}
           <div className="absolute top-4 left-4 bg-warmGray-900/60 text-cream-50 px-3 py-1 rounded-full text-sm font-medium">
-            Recipe
+            {post.postType === 'reel' ? 'Reel' : 'Recipe'}
           </div>
         </div>
         
@@ -303,7 +313,7 @@ const PostDetail = () => {
               </div>
 
               {/* Ingredients */}
-              {post.ingredients && post.ingredients.length > 0 && (
+              {post.postType !== 'reel' && post.ingredients && post.ingredients.length > 0 && (
                 <div className="mb-6 bg-primary-50 p-5 rounded-xl border border-primary-100">
                   <div className="flex items-center gap-2 mb-3">
                     <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -324,7 +334,7 @@ const PostDetail = () => {
               )}
 
               {/* Cooking Steps */}
-              {post.steps && post.steps.length > 0 && (
+              {post.postType !== 'reel' && post.steps && post.steps.length > 0 && (
                 <div className="mb-6">
                   <div className="flex items-center gap-2 mb-3">
                     <svg className="w-5 h-5 text-secondary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

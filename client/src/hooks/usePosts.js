@@ -24,13 +24,13 @@ export const usePosts = () => {
       const response = await postService.getAllPosts(page);
 
       // Backend returns { page, limit, total, totalPages, posts }
-      const postsArray = response.data?.posts || response.posts || [];
-      const hasMore = response.data?.page < response.data?.totalPages || false;
+      const postsArray = response.posts || [];
+      const hasMore = (response.page || page) < (response.totalPages || page);
 
       dispatch(fetchPostsSuccess({
         posts: postsArray,
         hasMore: hasMore,
-        page: response.data?.page || page,
+        page: response.page || page,
         reset,
       }));
 
@@ -47,8 +47,9 @@ export const usePosts = () => {
   const createPost = useCallback(async (postData) => {
     try {
       const response = await postService.createPost(postData);
-      dispatch(addPostAction(response.data));
-      return { success: true, data: response.data };
+      const createdPost = response.post || response;
+      dispatch(addPostAction(createdPost));
+      return { success: true, data: createdPost };
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -57,8 +58,9 @@ export const usePosts = () => {
   const updatePost = useCallback(async (postId, postData) => {
     try {
       const response = await postService.updatePost(postId, postData);
-      dispatch(updatePostAction(response.data));
-      return { success: true, data: response.data };
+      const updatedPost = response.post || response;
+      dispatch(updatePostAction(updatedPost));
+      return { success: true, data: updatedPost };
     } catch (error) {
       return { success: false, error: error.message };
     }

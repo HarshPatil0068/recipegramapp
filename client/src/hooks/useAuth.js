@@ -21,7 +21,7 @@ export const useAuth = () => {
     try {
       dispatch(loginStart());
       const response = await authService.login(credentials);
-      dispatch(loginSuccess(response.data));
+      dispatch(loginSuccess(response));
       return { success: true };
     } catch (error) {
       dispatch(loginFailure(error.message));
@@ -33,7 +33,7 @@ export const useAuth = () => {
     try {
       dispatch(registerStart());
       const response = await authService.register(userData);
-      dispatch(registerSuccess(response.data));
+      dispatch(registerSuccess(response));
       return { success: true };
     } catch (error) {
       dispatch(registerFailure(error.message));
@@ -45,7 +45,7 @@ export const useAuth = () => {
     try {
       dispatch(getCurrentUserStart());
       const response = await userService.getCurrentUser();
-      dispatch(getCurrentUserSuccess(response.data));
+      dispatch(getCurrentUserSuccess(response));
       return { success: true };
     } catch (error) {
       dispatch(getCurrentUserFailure(error.message));
